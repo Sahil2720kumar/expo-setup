@@ -4,9 +4,18 @@ import { Drawer } from 'expo-router/drawer';
 
 import 'react-native-gesture-handler';
 import { HeaderButton } from '../../components/HeaderButton';
+import CustomDrawerContent from '~/components/CustomDrawerContent';
 
 const DrawerLayout = () => (
-  <Drawer>
+  <Drawer
+    screenOptions={{
+      drawerHideStatusBarOnOpen:true,
+      headerTitleAlign:"center",
+      headerTitleStyle:{
+        fontWeight:"bold"
+      }
+    }}
+  >
     <Drawer.Screen
       name="index"
       options={{
