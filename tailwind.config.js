@@ -173,6 +173,7 @@ module.exports = {
         body: undefined,
         mono: undefined,
         roboto: ['Roboto', 'sans-serif'],
+        'sf-display': ['SF Pro Display', 'sans-serif'], // Add SF Pro Display
       },
       fontWeight: {
         extrablack: '950',

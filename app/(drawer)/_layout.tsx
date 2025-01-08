@@ -13,7 +13,19 @@ const DrawerLayout = () => (
       headerTitleAlign:"center",
       headerTitleStyle:{
         fontWeight:"bold"
-      }
+      },
+      
+      headerRight: () => (
+        <>
+          <Link href="/modal" asChild>
+            <HeaderButton iconName="search" />
+          </Link>
+          <Link href="/modal" asChild>
+            <HeaderButton iconName="shopping-cart" />
+          </Link>
+        </>
+      ),
+      headerTitle:"DropSquad"
     }}
   >
     <Drawer.Screen
@@ -22,16 +34,7 @@ const DrawerLayout = () => (
         headerTitle: 'DropSquad',
         drawerLabel: 'Home',
         drawerIcon: ({ size, color }) => <Ionicons name="home-outline" size={size} color={color} />,
-        headerRight: () => (
-          <>
-            <Link href="/modal" asChild>
-              <HeaderButton iconName="search" />
-            </Link>
-            <Link href="/modal" asChild>
-              <HeaderButton iconName="shopping-cart" />
-            </Link>
-          </>
-        ),
+        
       }}
     />
     <Drawer.Screen
@@ -41,11 +44,6 @@ const DrawerLayout = () => (
         drawerLabel: 'Tabs',
         drawerIcon: ({ size, color }) => (
           <MaterialIcons name="border-bottom" size={size} color={color} />
-        ),
-        headerRight: () => (
-          <Link href="/modal" asChild>
-            <HeaderButton />
-          </Link>
         ),
       }}
     />

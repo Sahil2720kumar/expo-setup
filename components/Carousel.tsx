@@ -1,28 +1,21 @@
 import React, { useState, useRef } from 'react';
-import { View, FlatList, Dimensions, StyleSheet, Image } from 'react-native';
+import { View, FlatList, StyleSheet, Image } from 'react-native';
 import { Button, ButtonText } from './ui/button';
 import { Text } from './ui/text';
 
-const { width, height } = Dimensions.get('window');
-const Carousel = ({ data }) => {
+const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
   const flatListRef = useRef(null);
 
   const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
+    <View style={[styles.itemContainer, { width: containerWidth }]}>
       <Image resizeMode="cover" source={require('./../assets/cloth.png')} style={styles.image} />
-      <Text size="xl" className="absolute  left-4 top-5  font-semibold text-black">
+      <Text size="xl" style={styles.title}>
         LACOSTE
       </Text>
       <Button
-        style={{
-          position: 'absolute',
-          bottom: 75,
-          left: '50%',
-          transform: [{ translateX: -70 }, { translateY: 0 }], // Adjust these values based on button dimension
-          backgroundColor: '#F93C00',
-          borderRadius: 30,
-        }}
+        style={[styles.button, { display: buttonVisible ? 'flex' : 'none' }]}
         size="xl"
         variant="solid"
         action="primary">
@@ -42,7 +35,12 @@ const Carousel = ({ data }) => {
   }).current;
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container,{height:carouselHeight}]}
+      onLayout={(event) => {
+        const { width } = event.nativeEvent.layout;
+        setContainerWidth(width);
+      }}>
       <FlatList
         ref={flatListRef}
         data={data}
@@ -71,32 +69,42 @@ const Carousel = ({ data }) => {
 
 const styles = StyleSheet.create({
   container: {
-    width,
-    height: '85%',
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   itemContainer: {
-    width,
+    height: '100%', // Match container height
+    position: 'relative',
+    backgroundColor: 'pink',
   },
   image: {
-    width,
+    width: '100%',
     height: '100%',
     borderRadius: 10,
   },
   title: {
-    fontSize: 18,
+    position: 'absolute',
+    left: 16,
+    top: 16,
     fontWeight: 'bold',
-    marginTop: 10,
+    color: 'black',
+    fontSize: 18,
+  },
+  button: {
+    position: 'absolute',
+    bottom: 75,
+    left: '50%',
+    transform: [{ translateX: -70 }],
+    backgroundColor: '#F93C00',
+    borderRadius: 30,
   },
   pagination: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
     position: 'absolute',
-    right: 0,
-    left: 0,
     bottom: 24,
-    marginInline: 'auto',
+    width: '100%',
   },
   paginationDot: {
     width: 60,
