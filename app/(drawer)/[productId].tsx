@@ -11,11 +11,20 @@ import { Icon } from '~/components/ui/icon';
 import ProductAccordion from '~/components/ProductAccordion';
 import ProductSliderCard from '~/components/ProductSliderCard';
 import Footer from '~/components/Footer';
+import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 
 const ProductDetailsScreen = () => {
+  console.log('re render');
   const [selectedColor, setSelectedColor] = useState('393944');
   const [selectedSize, setSelectedSize] = useState('S');
   const sliderData = [1, 2, 34, 4, 5];
+  const { width: screenWidth } = Dimensions.get('window');
+
+  const marginAuto = useBreakpointValue({
+    default: '',
+    sm: 'auto',
+    md: 'auto',
+  });
 
   const careAdvice = [
     { id: 1, icon: Iron, description: 'Iron at a maximum of 110ºC/230ºF' },
@@ -39,10 +48,11 @@ const ProductDetailsScreen = () => {
         padding: 15,
         overflowX: 'hidden',
         maxWidth: 600,
-        marginHorizontal: 'auto',
+
+        marginHorizontal: marginAuto,
       }} // Ensures scrolling when content overflows
       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
-      className='max-w-[600] mx-auto'
+      // className='max-w-[600] mx-auto'
     >
       {/* TOP BUTTONS */}
       <View className=" mt-[14] flex-row items-center justify-between">
@@ -62,7 +72,7 @@ const ProductDetailsScreen = () => {
         </View>
 
         {/* PRODUCT DETAILS SECTION */}
-        <View className="gap-6" style={{ minHeight: calculatedHeight + 110 }}>
+        <View className="gap-6" style={{ height: calculatedHeight + 110, maxHeight: 800,minHeight:600 }}>
           {/* BASIS PRODUCT INFORMATION */}
           <View className="mt-4 h-[100] flex-row items-center justify-between">
             <View className="gap-0.5">
@@ -142,7 +152,7 @@ const ProductDetailsScreen = () => {
         </View>
 
         {/* CARE ACCORDION & PRODUCT suggestion SECTION */}
-        <View className="gap-4" style={{ minHeight: calculatedHeight + 320 }}>
+        <View className="gap-4" style={{ height: calculatedHeight + 320, maxHeight: 700 }}>
           <View className="mt-3">
             <Text className="text-lg font-semibold text-[#000000]">CARE</Text>
 

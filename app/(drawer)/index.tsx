@@ -10,12 +10,20 @@ import { Icon } from '~/components/ui/icon';
 import { Text } from '~/components/ui/text';
 import { ListChecks, Truck, UserRoundCheck } from 'lucide-react-native';
 import Footer from '~/components/Footer';
+import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 
 export default function Home() {
   const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
   const isMobile = screenWidth < 768;
   const calculatedHeight = isMobile ? screenHeight - 100 : '90%';
   const calculatedAdditionalHeight = screenHeight + 100;
+
+  const marginAuto=useBreakpointValue({
+    default:"",
+    sm:"auto",
+    md:"auto"
+  })
+  
   const carouselData = [
     { id: 1, title: 'Item 1', image: 'https://via.placeholder.com/300x200?text=Item+1' },
     { id: 2, title: 'Item 2', image: 'https://via.placeholder.com/300x200?text=Item+2' },
@@ -37,7 +45,7 @@ export default function Home() {
     <>
       <Stack.Screen options={{ title: 'Home' }} />
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, backgroundColor: '#fff',maxWidth:600,marginHorizontal:"auto" }} // Ensures scrolling when content overflows
+        contentContainerStyle={{ flexGrow: 1, backgroundColor: '#fff',maxWidth:600, marginHorizontal: marginAuto, }} // Ensures scrolling when content overflows
         showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
       >
         {/* CAROUSEL SECTION */}
