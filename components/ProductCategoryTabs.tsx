@@ -1,17 +1,21 @@
-import { FlatList, Pressable, ScrollView, View } from 'react-native';
+import { Dimensions, FlatList, Pressable, ScrollView, View } from 'react-native';
 import React, { useState } from 'react';
 import { Text } from './ui/text';
 import ProductCard from './ProductCard';
 import { Button, ButtonText } from './ui/button';
 import { ChevronRightIcon, Icon } from './ui/icon';
+import { Platform } from 'react-native';
+import { Box } from './ui/box';
 
 const ProductCategoryTabs = () => {
   const categories = ['All', 'Shoes', 'Jeans', 'T-shirt', 'Headwear'];
   const products = [1, 2, 3, 4];
   const [activeTab, setActiveTab] = useState('All');
+
+  const { width } = Dimensions.get('window');
   return (
     <View className="mt-4">
-      <View className="h-11 items-center justify-center">
+      <View className="h-11 items-center justify-center ">
         <FlatList
           data={categories}
           horizontal
@@ -39,21 +43,26 @@ const ProductCategoryTabs = () => {
           )}
         />
       </View>
-      <View className="" style={{ width: '100%', height: 620, paddingHorizontal: 15}}>
-        <FlatList
-          contentContainerClassName="gap-5 m-5"
-          columnWrapperClassName="gap-2"
-          numColumns={2}
-          data={products}
-          renderItem={({ item }) => <ProductCard key={item} />}
-        />
+      <View className="px-15 min-h-[650] w-full">
+        <View className='' style={{ flex: 1, justifyContent: 'center', alignItems: "center" }}>
+          <FlatList
+            columnWrapperClassName="gap-2"
+            numColumns={2}
+            data={products}
+            renderItem={({ item }) => <ProductCard key={item} />}
+          />
+        </View>
         <Button
           style={{
             borderRadius: 30,
             width:199,
             height:48,
             alignSelf:"center",
-            marginTop:36
+            marginTop:36,
+            paddingHorizontal:0,
+            ...(Platform.OS === 'web' && {
+              width:220 // Web-specific style
+            }),
           }}
           size="xl"
           variant="outline"

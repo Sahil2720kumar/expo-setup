@@ -11,8 +11,8 @@ export default function ProductCard() {
   return (
     <View
       className="rounded-lg"
-      style={{ flex: 1, aspectRatio: 1 / 1.5, marginTop: 20, backgroundColor: '' }}>
-      <View style={{ width: '100%', height: 190, overflow: 'hidden',borderRadius:5 }}>
+      style={{width:168, aspectRatio: 1 / 1.5, marginTop: 20, backgroundColor: '' }}>
+      <View style={{ width: '100%', height: 190,borderRadius:5 }}>
         <Image
           resizeMode="cover"
           className="flex-1 rounded-lg"

@@ -38,8 +38,11 @@ const ProductDetailsScreen = () => {
         backgroundColor: '#fff',
         padding: 15,
         overflowX: 'hidden',
+        maxWidth: 600,
+        marginHorizontal: 'auto',
       }} // Ensures scrolling when content overflows
       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
+      className='max-w-[600] mx-auto'
     >
       {/* TOP BUTTONS */}
       <View className=" mt-[14] flex-row items-center justify-between">
@@ -54,12 +57,12 @@ const ProductDetailsScreen = () => {
       </View>
       <View>
         {/* PRODUCT IMAGE CAROUSEL */}
-        <View className="mt-4 h-screen" style={{ height: calculatedHeight }}>
+        <View className="mt-4" style={{ height: calculatedHeight }}>
           <Carousel data={carouselData} buttonVisible={false} height={'100%'} />
         </View>
 
         {/* PRODUCT DETAILS SECTION */}
-        <View className="h-screen gap-6" style={{ height: calculatedHeight + 110 }}>
+        <View className="gap-6" style={{ minHeight: calculatedHeight + 110 }}>
           {/* BASIS PRODUCT INFORMATION */}
           <View className="mt-4 h-[100] flex-row items-center justify-between">
             <View className="gap-0.5">
@@ -125,6 +128,7 @@ const ProductDetailsScreen = () => {
               <FlatList
                 data={careAdvice}
                 numColumns={2}
+                showsVerticalScrollIndicator={false}
                 columnWrapperClassName="items-center justify-between gap-8"
                 renderItem={({ item }) => (
                   <View className="mt-[24] flex-1  ">
@@ -138,7 +142,7 @@ const ProductDetailsScreen = () => {
         </View>
 
         {/* CARE ACCORDION & PRODUCT suggestion SECTION */}
-        <View className="h-screen" style={{height:calculatedHeight+320}}>
+        <View className="gap-4" style={{ minHeight: calculatedHeight + 320 }}>
           <View className="mt-3">
             <Text className="text-lg font-semibold text-[#000000]">CARE</Text>
 
@@ -148,7 +152,7 @@ const ProductDetailsScreen = () => {
           {/* CUSTOMERS LIKE SECTION */}
           <View className="mt-[60]">
             <Text className="text-center text-2xl font-bold text-black">YOU MAY ALSO LIKE</Text>
-            <View className=''>
+            <View className="">
               <FlatList
                 data={sliderData}
                 renderItem={({ item }) => (
@@ -167,7 +171,7 @@ const ProductDetailsScreen = () => {
 
           {/* FOOTER SECTION */}
           <View>
-            <Footer/>
+            <Footer />
           </View>
         </View>
       </View>

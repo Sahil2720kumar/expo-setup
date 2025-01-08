@@ -25,7 +25,7 @@ const TwitterIcon = () => (
 
 const Footer = () => {
   return (
-    <View className="mt-16 gap-7">
+    <View className="pt-16 gap-7 pb-5 bg-white">
       <View className="flex-row items-center justify-center gap-12">
         <Text className="text-xl font-semibold text-black">About</Text>
         <Text className="text-xl font-semibold text-black">Contact</Text>

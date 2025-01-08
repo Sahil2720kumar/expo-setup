@@ -7,7 +7,7 @@ import { Link } from './ui/link';
 import { Text } from './ui/text';
 import { Image } from 'react-native';
 
-export default function ProductSliderCard({width,height,imageHeight='75%',description=''}) {
+export default function ProductSliderCard({width,height,imageHeight='70%',description=''}) {
   return (
     <View
       className="rounded-lg"

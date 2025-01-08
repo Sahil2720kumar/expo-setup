@@ -1,7 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { View, FlatList, StyleSheet, Image } from 'react-native';
+import { View, FlatList, StyleSheet, Platform } from 'react-native';
 import { Button, ButtonText } from './ui/button';
 import { Text } from './ui/text';
+import clothImage from './../assets/cloth.png';
+import { Image } from 'react-native';
+// import { Image } from './ui/image';
 
 const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -10,17 +13,11 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
 
   const renderItem = ({ item }) => (
     <View style={[styles.itemContainer, { width: containerWidth }]}>
-      <Image resizeMode="cover" source={require('./../assets/cloth.png')} style={styles.image} />
+      <Image resizeMode="cover" source={clothImage} style={styles.image} />
+
       <Text size="xl" style={styles.title}>
         LACOSTE
       </Text>
-      <Button
-        style={[styles.button, { display: buttonVisible ? 'flex' : 'none' }]}
-        size="xl"
-        variant="solid"
-        action="primary">
-        <ButtonText>View Collection</ButtonText>
-      </Button>
     </View>
   );
 
@@ -36,7 +33,7 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
 
   return (
     <View
-      style={[styles.container,{height:carouselHeight}]}
+      style={[styles.container, { height: carouselHeight }]}
       onLayout={(event) => {
         const { width } = event.nativeEvent.layout;
         setContainerWidth(width);
@@ -45,6 +42,7 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
         ref={flatListRef}
         data={data}
         renderItem={renderItem}
+        // className='bg-blue-400 '
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -63,6 +61,14 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
           />
         ))}
       </View>
+      <Button
+        className="bottom-[90] rounded-[30] bg-[#F93C00]"
+        style={[styles.button, { display: buttonVisible ? 'flex' : 'none' }]}
+        size="xl"
+        variant="solid"
+        action="primary">
+        <ButtonText>View Collection</ButtonText>
+      </Button>
     </View>
   );
 };
@@ -71,11 +77,15 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 10,
     overflow: 'hidden',
+    // backgroundColor:"pink"
   },
   itemContainer: {
     height: '100%', // Match container height
     position: 'relative',
-    backgroundColor: 'pink',
+    // backgroundColor: 'pink',
+    ...(Platform.OS === 'web' && {
+      aspectRatio: 1 / 1.85, // Web-specific style
+    }),
   },
   image: {
     width: '100%',
@@ -92,11 +102,9 @@ const styles = StyleSheet.create({
   },
   button: {
     position: 'absolute',
-    bottom: 75,
+    //bottom: 90,
     left: '50%',
     transform: [{ translateX: -70 }],
-    backgroundColor: '#F93C00',
-    borderRadius: 30,
   },
   pagination: {
     flexDirection: 'row',
