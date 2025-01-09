@@ -47,6 +47,18 @@ const DrawerLayout = () => (
         ),
       }}
     />
+    <Drawer.Screen
+      name="(auth)"
+      options={{
+        headerTitle: 'auth',
+        drawerLabel: 'auth',
+        headerShown:false,
+        
+        drawerIcon: ({ size, color }) => (
+          <MaterialIcons name="border-bottom" size={size} color={color} />
+        ),
+      }}
+    />
   </Drawer>
 );
 

@@ -1,15 +1,18 @@
 import { TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { Image } from './ui/image';
+// import { Image } from 'react-native';
 import { Text } from './ui/text';
 import { Minus, Plus } from 'lucide-react-native';
 
 const CartItem = () => {
   return (
-    <View className="h-[150] w-full flex-row gap-3">
+    <View className=" w-full flex-row gap-3" style={{aspectRatio:1/0.4}}>
       <View className="w-[34%] rounded-[5]">
         <Image
-          size="full"
+          resizeMode="cover"
+          size='full'
+          style={{width:"100%",height:"100%"}}
           className="rounded-[5]"
           source={require('./../assets/cloth.png')}
           alt="ProductImage"

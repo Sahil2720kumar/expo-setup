@@ -3,6 +3,7 @@ import { Minus, Plus } from 'lucide-react-native';
 import { Dimensions, Platform, TouchableOpacity, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-virtualized-view';
+// import { ScrollView } from 'react-native';
 import CartItem from '~/components/CartItem';
 import { Bag } from '~/components/Icons';
 
@@ -21,28 +22,53 @@ export default function Modal() {
     sm: 'auto',
     md: 'auto',
   });
-  const cartItems = [1, 2, 3, 4, 5, 6];
-  return (
-    <>
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          backgroundColor: '#fff',
-          paddingHorizontal: 15,
-          paddingTop:15,
-          overflowX: 'hidden',
-          maxWidth: 600,
 
-          marginHorizontal: marginAuto,
-        }} // Ensures scrolling when content overflows
-        showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
-        // className='max-w-[600] mx-auto'
-      >
-        <View className="" style={{ height: calculatedHeight + 130,justifyContent:"space-between"}}>
-          <View className="gap-6" style={{ height: calculatedHeight-50 }}>
-            <Text size="2xl" className="font-semibold text-black">
-              CART
-            </Text>
+  const minWidth = useBreakpointValue({
+    default: 300,
+    sm: 600,
+    md: 600,
+  });
+
+  const cartItems = [1, 2, 3, 4, 5, 6];
+  // <ScrollView
+  //       contentContainerStyle={{ flexGrow: 1, backgroundColor: '#000000',maxWidth:600, marginHorizontal: marginAuto, }} // Ensures scrolling when content overflows
+  //       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
+  //     ></ScrollView>
+  return (
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        backgroundColor: '#fff',
+        paddingHorizontal: 15,
+        paddingTop: 15,
+        overflowX: 'hidden',
+        // overflowY: 'scroll',
+        maxWidth: 600,
+        minWidth: minWidth,
+        marginHorizontal: marginAuto,
+      }} // Ensures scrolling when content overflows
+      showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
+      // className='max-w-[600] mx-auto'
+      style={{ height: screenHeight }}>
+      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+
+      <View
+        className=""
+        style={{
+          height: '100%',
+          paddingBottom: 3,
+          // backgroundColor:"pink",
+
+          justifyContent: 'flex-start',
+          ...(Platform.OS === 'web' && {
+            justifyContent: 'space-between', // Web-specific style
+          }),
+        }}>
+        <View className="gap-6" style={{ height: calculatedHeight - 50, backgroundColor: '' }}>
+          <Text size="2xl" className="font-semibold text-black">
+            CART
+          </Text>
+          <View className="flex-1 justify-center">
             <FlatList
               data={cartItems}
               renderItem={({ item }) => <CartItem key={item} />}
@@ -50,28 +76,34 @@ export default function Modal() {
               scrollEnabled
               showsVerticalScrollIndicator={false}
             />
-          </View>
-          <View className="w-full gap-3.5 " style={{height:154,gap:14}}>
-            <View className="w-full flex-row justify-between">
-              <Text size="xl" className="font-bold text-black ">
-                SUB TOTAL
-              </Text>
-              <Text size="xl" className="font-bold text-[#F93C00]">
-                $179
-              </Text>
-            </View>
-            <Text className="w-[269] text-[#888888]">
-              *shipping charges, taxes and discount codes are calculated at the time of accounting.
-            </Text>
-
-            <Button size="md" variant="solid" className='bg-[#F93C00] rounded-[28]' style={{borderRadius:28,height:48}}>
-              <Bag/>
-              <ButtonText size='lg'>BUY NOW</ButtonText>
-            </Button>
+            {/* <Text size='lg' className='text-[#888888] text-center'>You have no items in your Shopping Bag.</Text> */}
           </View>
         </View>
-      </ScrollView>
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </>
+        <View
+          className="w-full"
+          style={{ height: 164, gap: 4, justifyContent: 'flex-end', backgroundColor: '' }}>
+          <View className="w-full flex-row justify-between">
+            <Text size="xl" className="font-bold text-black ">
+              SUB TOTAL
+            </Text>
+            <Text size="xl" className="font-bold text-[#F93C00]">
+              $179
+            </Text>
+          </View>
+          <Text className="w-[269] text-[#888888]">
+            *shipping charges, taxes and discount codes are calculated at the time of accounting.
+          </Text>
+
+          <Button
+            size="md"
+            variant="solid"
+            className="rounded-[28] bg-[#F93C00]"
+            style={{ borderRadius: 28, height: 48 }}>
+            <Bag />
+            <ButtonText size="lg">BUY NOW</ButtonText>
+          </Button>
+        </View>
+      </View>
+    </ScrollView>
   );
 }

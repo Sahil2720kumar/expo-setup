@@ -48,7 +48,7 @@ const ProductDetailsScreen = () => {
         padding: 15,
         overflowX: 'hidden',
         maxWidth: 600,
-
+        overflowY:'hidden',
         marginHorizontal: marginAuto,
       }} // Ensures scrolling when content overflows
       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
@@ -65,9 +65,9 @@ const ProductDetailsScreen = () => {
           <Share2 color={'black'} />
         </View>
       </View>
-      <View>
+      <View className='flex-1 h-[100%]'>
         {/* PRODUCT IMAGE CAROUSEL */}
-        <View className="mt-4" style={{ height: calculatedHeight }}>
+        <View className="mt-4" style={{ height: calculatedHeight,maxHeight:900 }}>
           <Carousel data={carouselData} buttonVisible={false} height={'100%'} />
         </View>
 
