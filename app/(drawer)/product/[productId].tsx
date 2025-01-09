@@ -14,7 +14,7 @@ import Footer from '~/components/Footer';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 
 const ProductDetailsScreen = () => {
-  console.log('re render');
+  // console.log('re render');
   const [selectedColor, setSelectedColor] = useState('393944');
   const [selectedSize, setSelectedSize] = useState('S');
   const sliderData = [1, 2, 34, 4, 5];

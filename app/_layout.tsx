@@ -16,7 +16,7 @@ export default function RootLayout() {
       <GluestackUIProvider>
         <Stack>
           <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ title: 'Modal', presentation: 'modal' }} />
+          <Stack.Screen name="modal" options={{ title: 'Cart', presentation: 'modal' }} />
         </Stack>
         <StatusBar style="auto" />
       </GluestackUIProvider>
