@@ -1,18 +1,22 @@
-import { Stack } from 'expo-router';
-import Drawer from 'expo-router/drawer';
+import { Slot, Stack } from 'expo-router';
+import React from 'react';
+import { SafeAreaView, StyleSheet, View, Image, Text, StatusBar } from 'react-native';
 
-const StackLayout = () => {
+export default function Layout() {
   return (
-    <Stack
-      screenOptions={{
-        headerTitle:"DropSquad",
-        headerTitleAlign: 'center',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-    />
+    <SafeAreaView style={styles.container}>
+      <View className="h-[64] items-center justify-center bg-white">
+        <Text className='font-semibold text-black' style={{fontSize:22}}>DropSquad</Text>
+      </View>
+      <Slot />
+    </SafeAreaView>
   );
-};
+}
 
-export default StackLayout;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+    backgroundColor: 'white',
+  },
+});

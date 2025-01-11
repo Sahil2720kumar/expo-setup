@@ -48,7 +48,7 @@ const ProductDetailsScreen = () => {
         padding: 15,
         overflowX: 'hidden',
         maxWidth: 600,
-        overflowY:'hidden',
+        // overflowY:'hidden',
         marginHorizontal: marginAuto,
       }} // Ensures scrolling when content overflows
       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
