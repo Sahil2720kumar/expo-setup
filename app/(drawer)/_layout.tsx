@@ -59,6 +59,14 @@ const DrawerLayout = () => (
         ),
       }}
     />
+    <Drawer.Screen
+      name="products"
+      options={{       
+        drawerIcon: ({ size, color }) => (
+          <MaterialIcons name="border-bottom" size={size} color={color} />
+        ),
+      }}
+    />
   </Drawer>
 );
 

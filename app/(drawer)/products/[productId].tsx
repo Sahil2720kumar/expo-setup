@@ -1,4 +1,4 @@
-import { FlatList, View } from 'react-native';
+import { FlatList, Pressable, View } from 'react-native';
 import React, { useState } from 'react';
 import { ScrollView } from 'react-native-virtualized-view';
 import { Text } from '~/components/ui/text';
@@ -12,8 +12,10 @@ import ProductAccordion from '~/components/ProductAccordion';
 import ProductSliderCard from '~/components/ProductSliderCard';
 import Footer from '~/components/Footer';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
+import { Stack, useRouter } from 'expo-router';
 
 const ProductDetailsScreen = () => {
+  const router =useRouter()
   // console.log('re render');
   const [selectedColor, setSelectedColor] = useState('393944');
   const [selectedSize, setSelectedSize] = useState('S');
@@ -54,12 +56,13 @@ const ProductDetailsScreen = () => {
       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
       // className='max-w-[600] mx-auto'
     >
+      {/* <Stack.Screen options={{headerShown:false}}/> */}
       {/* TOP BUTTONS */}
       <View className=" mt-[14] flex-row items-center justify-between">
-        <View className="flex-row gap-2">
+        <Pressable onPress={()=>router.back()}  className="flex-row gap-2">
           <ChevronLeft color={'black'} />
           <Text className="text-lg font-medium text-black">Back</Text>
-        </View>
+        </Pressable>
         <View className="flex-row items-center justify-between gap-2">
           <Heart color={'black'} />
           <Share2 color={'black'} />
