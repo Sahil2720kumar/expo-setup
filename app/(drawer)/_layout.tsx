@@ -17,10 +17,10 @@ const DrawerLayout = () => (
       
       headerRight: () => (
         <>
-          <Link href="/modal" asChild>
+          <Link href="/cart" asChild>
             <HeaderButton iconName="search" />
           </Link>
-          <Link href="/modal" asChild>
+          <Link href="/cart" asChild>
             <HeaderButton iconName="shopping-cart" />
           </Link>
         </>

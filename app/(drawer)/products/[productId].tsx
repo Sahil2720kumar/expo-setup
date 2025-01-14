@@ -13,8 +13,10 @@ import ProductSliderCard from '~/components/ProductSliderCard';
 import Footer from '~/components/Footer';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 import { Stack, useRouter } from 'expo-router';
+import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 const ProductDetailsScreen = () => {
+  const {marginAuto}=useCommonBreakPoints()
   const router =useRouter()
   // console.log('re render');
   const [selectedColor, setSelectedColor] = useState('393944');
@@ -22,11 +24,6 @@ const ProductDetailsScreen = () => {
   const sliderData = [1, 2, 34, 4, 5];
   const { width: screenWidth } = Dimensions.get('window');
 
-  const marginAuto = useBreakpointValue({
-    default: '',
-    sm: 'auto',
-    md: 'auto',
-  });
 
   const careAdvice = [
     { id: 1, icon: Iron, description: 'Iron at a maximum of 110ºC/230ºF' },
@@ -59,7 +56,7 @@ const ProductDetailsScreen = () => {
       {/* <Stack.Screen options={{headerShown:false}}/> */}
       {/* TOP BUTTONS */}
       <View className=" mt-[14] flex-row items-center justify-between">
-        <Pressable onPress={()=>router.back()}  className="flex-row gap-2">
+        <Pressable onPress={()=>router.push("/(drawer)/products")}  className="flex-row gap-2">
           <ChevronLeft color={'black'} />
           <Text className="text-lg font-medium text-black">Back</Text>
         </Pressable>

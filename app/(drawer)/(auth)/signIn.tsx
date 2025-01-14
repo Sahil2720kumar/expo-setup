@@ -14,9 +14,11 @@ import { Icon } from '~/components/ui/icon';
 import { Input, InputField, InputIcon, InputSlot } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
+import { useCommonBreakPoints } from '~/utils/breakPoints';
 import { userSignInSchema } from '~/vaildators/userSchema';
 
 const SignIn = () => {
+  const {marginAuto,minWidth}=useCommonBreakPoints()
   const { width, height: screenHeight } = Dimensions.get('window');
   const [formData, setFormData] = useState({
     email: '',
@@ -32,17 +34,7 @@ const SignIn = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const marginAuto = useBreakpointValue({
-    default: '',
-    sm: 'auto',
-    md: 'auto',
-  });
-
-  const minWidth = useBreakpointValue({
-    default: 300,
-    sm: 600,
-    md: 600,
-  });
+ 
 
   const handleInputChange = (field, value) => {
     setFormData((prevState) => ({

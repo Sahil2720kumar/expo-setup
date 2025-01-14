@@ -12,9 +12,12 @@ import ProductCard from '~/components/ProductCard';
 import Pagination from '~/components/Pagination';
 import Footer from '~/components/Footer';
 import { Stack } from 'expo-router';
+import { useCommonBreakPoints } from '~/utils/breakPoints';
 
-const CategoryScreen = () => {
+const ProductsScreen = () => {
   // console.log('category screen re render');
+  const { marginAuto, minWidth, iconProductSize:iconSize, noColumns } = useCommonBreakPoints();
+
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 10; // Example total number of pages
 
@@ -25,26 +28,9 @@ const CategoryScreen = () => {
   };
   // const []=useState(products)
 
-  const marginAuto = useBreakpointValue({
-    default: '',
-    sm: 'auto',
-    md: 'auto',
-  });
-  const minWidth = useBreakpointValue({
-    default: 300,
-    sm: 600,
-    md: 600,
-  });
-  const iconSize = useBreakpointValue({
-    default: 20,
-    sm: 24,
-    md: 24,
-  });
-  const noColumns = useBreakpointValue({
-    default: 2,
-    sm: 3,
-    md: 3,
-  });
+  const handleProductsFilters = (data) => {
+    console.log('print from produts: ', data);
+  };
 
   return (
     <ScrollView
@@ -64,7 +50,9 @@ const CategoryScreen = () => {
       {/* TOP BUTTONS */}
       <View className=" mt-[14] flex-row items-center justify-between ">
         <View className="flex-row gap-2">
-          <Text className="text-xl font-bold font-medium text-black">Apparel (4500)</Text>
+          <Text size="xl" className="text-xl font-bold text-black">
+            Apparel (4500)
+          </Text>
         </View>
         <View className="flex-row items-center justify-between gap-4">
           <Button
@@ -74,7 +62,7 @@ const CategoryScreen = () => {
             className="items-center  justify-center  rounded-full bg-[#F1F1F1] p-[12] ">
             <LayoutList size={iconSize} color="black" />
           </Button>
-          <FilterDrawer />
+          <FilterDrawer handleProductsFilters={handleProductsFilters} />
         </View>
       </View>
       <View className="flex-1 flex-grow">
@@ -98,9 +86,9 @@ const CategoryScreen = () => {
           </View>
           <View className="pt-[32] md:pt-11  ">
             <Pagination
-            // currentPage={currentPage}
-            // totalPages={totalPages}
-            // onPageChange={handlePageChange}
+              // currentPage={currentPage}
+              totalPages={totalPages}
+              // onPageChange={handlePageChange}
             />
           </View>
         </View>
@@ -112,4 +100,4 @@ const CategoryScreen = () => {
   );
 };
 
-export default CategoryScreen;
+export default ProductsScreen;

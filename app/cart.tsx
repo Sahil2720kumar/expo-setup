@@ -12,22 +12,14 @@ import { Button, ButtonText } from '~/components/ui/button';
 import { Image } from '~/components/ui/image';
 import { Text } from '~/components/ui/text';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
+import { useCommonBreakPoints } from '~/utils/breakPoints';
 
-export default function Modal() {
+export default function CartScreen() {
+  const {marginAuto,minWidth}=useCommonBreakPoints()
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
 
-  const marginAuto = useBreakpointValue({
-    default: '',
-    sm: 'auto',
-    md: 'auto',
-  });
-
-  const minWidth = useBreakpointValue({
-    default: 300,
-    sm: 600,
-    md: 600,
-  });
+  
 
   const cartItems = [1, 2, 3, 4, 5, 6];
   // <ScrollView
@@ -55,22 +47,21 @@ export default function Modal() {
       <View
         className=""
         style={{
-          height: '100%',
           paddingBottom: 3,
-          // backgroundColor:"pink",
-
+          //backgroundColor:"pink",
+          flex:1,
           justifyContent: 'flex-start',
           ...(Platform.OS === 'web' && {
             justifyContent: 'space-between', // Web-specific style
           }),
         }}>
-        <View className="gap-6" style={{ height: calculatedHeight - 50, backgroundColor: '' }}>
+        <View className="gap-6" style={{ height: calculatedHeight-5, backgroundColor: '' }}>
           <Text size="2xl" className="font-semibold text-black">
             CART
           </Text>
           <View className="flex-1 justify-center">
             <FlatList
-              data={cartItems}
+              data={cartItems.slice(0,5)}
               renderItem={({ item }) => <CartItem key={item} />}
               contentContainerClassName="gap-6"
               scrollEnabled
@@ -81,7 +72,7 @@ export default function Modal() {
         </View>
         <View
           className="w-full"
-          style={{ height: 164, gap: 4, justifyContent: 'flex-end', backgroundColor: '' }}>
+          style={{ paddingVertical:10, gap: 4, justifyContent: 'flex-end', backgroundColor: '' }}>
           <View className="w-full flex-row justify-between">
             <Text size="xl" className="font-bold text-black ">
               SUB TOTAL

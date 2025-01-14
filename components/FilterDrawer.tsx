@@ -76,7 +76,7 @@ const clothPriceRanges = [
   { id: '4', name: 'Over ₹8200', min: 8200, max: Infinity },
 ];
 
-const FilterDrawer = memo(() => {
+const FilterDrawer = memo(({ handleProductsFilters }) => {
   // console.log('re render');
   const [showDrawer, setShowDrawer] = useState(false);
   const iconSize = useBreakpointValue({
@@ -118,6 +118,7 @@ const FilterDrawer = memo(() => {
 
   const handleApplyFilter = () => {
     console.log(filters);
+    handleProductsFilters(filters)
   };
 
   return (
@@ -357,7 +358,7 @@ const FilterDrawer = memo(() => {
                                 <CheckboxIcon as={CheckIcon} />
                               </CheckboxIndicator>
                               <CheckboxLabel>
-                              Rs(₹) {category.min}-{category.max}
+                                Rs(₹) {category.min}-{category.max}
                               </CheckboxLabel>
                             </Checkbox>
                           </HStack>
