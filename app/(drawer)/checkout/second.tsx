@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronRight, Minus, Package, Plus } from 'lucide-react-native';
 import { useState } from 'react';
@@ -17,6 +18,7 @@ import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value'
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CheckoutScreen() {
+  const router=useRouter()
   const {marginAuto,minWidth}=useCommonBreakPoints()
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
@@ -78,6 +80,7 @@ export default function CheckoutScreen() {
               size="md"
               variant="solid"
               action="secondary"
+              onPress={()=>router.push("/(drawer)/checkout/addAddress")}
               className="justify-between rounded-[28] bg-[#F1F1F1] hover:bg-[#F1F1F1]"
               style={{ borderRadius: 28, height: 48 }}
               isHovered={false}>

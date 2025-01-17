@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Minus, Package, Plus } from 'lucide-react-native';
 import { Dimensions, Platform, TouchableOpacity, View } from 'react-native';
@@ -15,6 +16,7 @@ import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value'
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CheckoutScreen() {
+  const router=useRouter()
   const {marginAuto,minWidth}=useCommonBreakPoints()
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
@@ -40,8 +42,7 @@ export default function CheckoutScreen() {
         marginHorizontal: marginAuto,
       }} // Ensures scrolling when content overflows
       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
-      // className='max-w-[600] mx-auto'
-      style={{ height: screenHeight }}>
+      >
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
 
       <View
@@ -91,6 +92,7 @@ export default function CheckoutScreen() {
 
           <Button
             size="md"
+            onPress={()=>router.push("/(drawer)/checkout/second")}
             variant="solid"
             className="rounded-[28] bg-[#F93C00]"
             style={{ borderRadius: 28, height: 48 }}>

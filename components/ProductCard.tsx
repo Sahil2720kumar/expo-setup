@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, TouchableOpacity, View } from 'react-native';
 import { Card } from './ui/card';
 import { Heading } from './ui/heading';
 import { HStack } from './ui/hstack';
@@ -10,7 +10,7 @@ import { Link } from 'expo-router';
 export default function ProductCard({ description = '', rating = '', price = '', id = 1 }) {
   return (
     <Link href={`/(drawer)/products/${id}`} asChild>
-      <Pressable className="rounded-lg" style={{ width: 168, marginTop: 20, backgroundColor: '' }}>
+      <TouchableOpacity activeOpacity={0.8} className="rounded-lg" style={{ width: 168, marginTop: 20, backgroundColor: '' }}>
         <View style={{ width: '100%', height: 190, borderRadius: 5 }}>
           <Image
             resizeMode="cover"
@@ -28,7 +28,7 @@ export default function ProductCard({ description = '', rating = '', price = '',
           </Text>
           <Text className="text-xl font-semibold text-[#F93C00]">{price ? price : '$179'}</Text>
         </View>
-      </Pressable>
+      </TouchableOpacity>
     </Link>
   );
 }

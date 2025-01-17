@@ -27,42 +27,21 @@ import { Input, InputField, InputSlot, InputIcon } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 import addressSchema from '~/vaildators/addressSchema';
-import {profileSchema} from '~/vaildators/profileSchema';
+import profileSchema, { passwordChangeSchema } from '~/vaildators/profileSchema';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function ProfileScreen() {
+export default function PasswordChangeScreen() {
   const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
 
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
+    currentPassword:'',
+    newPassword:"",
+    confirmNewPassword:""
   });
-  const [image, setImage] = useState<string | null>(null);
 
-  const uploadImage = async () => {
-    try {
-      await ImagePicker.requestMediaLibraryPermissionsAsync()
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-
-      console.log(result);
-
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-      }
-    } catch (err) {
-      console.log('Image Uploading Error, ', err);
-    }
-  };
   const [errors, setErrors] = useState({});
 
   const [isInvalid, setIsInvalid] = useState(false);
@@ -74,12 +53,11 @@ export default function ProfileScreen() {
     }));
   };
 
-  const cartItems = [1, 2, 3, 4, 5, 6];
 
   const handleSubmit = async () => {
     console.log('onSubmit...');
     try {
-      const user = await profileSchema.validate(formData, { abortEarly: false }); // Collect all errors
+      const user = await passwordChangeSchema.validate(formData, { abortEarly: false }); // Collect all errors
       console.log(user);
       setErrors({});
     } catch (error) {
@@ -129,41 +107,7 @@ export default function ProfileScreen() {
             <Text size="2xl" className="text-center font-semibold uppercase text-black">
               Profile
             </Text>
-
-            <View style={{ flex: 0.4, backgroundColor: '' }}>
-              <View>
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-1 items-center">
-                    <View
-                      className="rounded-full bg-white"
-                      style={{
-                        width: profileImageSize, // Fixed size for the parent view
-                        height: profileImageSize,
-                        marginLeft: iconSize,
-                        overflow: 'hidden', // Ensures rounded corners clip the child content
-                        // alignItems: 'center', // Center content horizontally
-                        // justifyContent: 'center', // Center content vertically
-                      }}>
-                      <Image
-                        size={imageSize}
-                        style={{
-                          width: '100%', // Cover full width of the parent
-                          height: '100%', // Cover full height of the parent
-                        }}
-                        source={image?{uri:image}:require('assets/defaultUser.png')}
-                        alt="userImage"
-                      />
-                    </View>
-                  </View>
-                  <TouchableOpacity onPress={uploadImage}>
-                    <Upload size={iconSize} color={'black'} />
-                  </TouchableOpacity>
-                </View>
-                <Text size="lg" className="mt-[10] text-center text-black ">
-                  New Fashion
-                </Text>
-              </View>
-            </View>
+            <View style={{flex:0.4}}/>
 
             <View className="flex-1" style={{ flex: 1, backgroundColor: '' }}>
               <FormControl
@@ -182,16 +126,16 @@ export default function ProfileScreen() {
                     isReadOnly={false}
                     className="min-w-[50%] ">
                     <InputField
-                      placeholder="First name"
-                      onChangeText={(firstName) => handleInputChange('firstName', firstName)}
-                      value={formData.firstName}
+                      placeholder="Enter Current Password"
+                      onChangeText={(currentPassword) => handleInputChange('currentPassword', currentPassword)}
+                      value={formData.currentPassword}
                       placeholderClassName="text-[#000000]"
                     />
                   </Input>
                   <HStack
-                    className={`mt-1 ${errors.firstName ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
+                    className={`mt-1 ${errors.currentPassword ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
                     <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]">{errors.firstName ?? errors.firstName}</Text>
+                    <Text className="text-[#DC3545]">{errors.currentPassword ?? errors.currentPassword}</Text>
                   </HStack>
                 </View>
                 <View>
@@ -203,16 +147,16 @@ export default function ProfileScreen() {
                     isReadOnly={false}
                     className="min-w-[50%]">
                     <InputField
-                      placeholder="Last name"
-                      onChangeText={(lastName) => handleInputChange('lastName', lastName)}
-                      value={formData.lastName}
+                      placeholder="Enter New Password"
+                      onChangeText={(newPassword) => handleInputChange('newPassword', newPassword)}
+                      value={formData.newPassword}
                       placeholderClassName="text-[#000000]"
                     />
                   </Input>
                   <HStack
-                    className={`mt-1 ${errors.lastName ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
+                    className={`mt-1 ${errors.newPassword ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
                     <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]"> {errors.lastName ?? errors.lastName}</Text>
+                    <Text className="text-[#DC3545]"> {errors.newPassword ?? errors.newPassword}</Text>
                   </HStack>
                 </View>
 
@@ -225,42 +169,19 @@ export default function ProfileScreen() {
                     isReadOnly={false}
                     className="min-w-[250px]">
                     <InputField
-                      placeholder="Email address"
-                      onChangeText={(email) => handleInputChange('email', email)}
-                      value={formData.email}
+                      placeholder="Confirm New Password"
+                      onChangeText={(confirmNewPassword) => handleInputChange('confirmNewPassword', confirmNewPassword)}
+                      value={formData.confirmNewPassword}
                       placeholderClassName="text-[#000000]"
                     />
                   </Input>
                   <HStack
-                    className={`mt-1 ${errors.email ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
+                    className={`mt-1 ${errors.confirmNewPassword ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
                     <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]"> {errors.email ?? errors.email}</Text>
+                    <Text className="text-[#DC3545]"> {errors.confirmNewPassword ?? errors.confirmNewPassword}</Text>
                   </HStack>
                 </View>
 
-                <View>
-                  <Input
-                    variant="underlined"
-                    size="md"
-                    isDisabled={false}
-                    isInvalid={false}
-                    isReadOnly={false}
-                    className="min-w-[250px]">
-                    <InputField
-                      placeholder="Phone number"
-                      onChangeText={(phoneNumber) => handleInputChange('phoneNumber', phoneNumber)}
-                      value={formData.phoneNumber}
-                      placeholderClassName="text-[#000000]"
-                    />
-                  </Input>
-                  <HStack
-                    className={`mt-1 ${errors.phoneNumber ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
-                    <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]">
-                      {errors.phoneNumber ?? errors.phoneNumber}
-                    </Text>
-                  </HStack>
-                </View>
               </FormControl>
             </View>
           </View>

@@ -1,16 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
-import {
-  AlertCircleIcon,
-  ChevronRight,
-  EyeIcon,
-  EyeOffIcon,
-  Minus,
-  Package,
-  Plus,
-  Upload,
-} from 'lucide-react-native';
+import { AlertCircleIcon, Image } from 'lucide-react-native';
 import { useState } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 // import { ScrollView } from 'react-native-virtualized-view';
 import { ScrollView } from 'react-native';
@@ -22,14 +21,15 @@ import { Button, ButtonIcon, ButtonText } from '~/components/ui/button';
 import { FormControl } from '~/components/ui/form-control';
 import { HStack } from '~/components/ui/hstack';
 import { Icon } from '~/components/ui/icon';
-import { Image } from '~/components/ui/image';
 import { Input, InputField, InputSlot, InputIcon } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 import addressSchema from '~/vaildators/addressSchema';
-import {profileSchema} from '~/vaildators/profileSchema';
+import { profileSchema } from '~/vaildators/profileSchema';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import * as ImagePicker from 'expo-image-picker';
+import { Textarea, TextareaInput } from '~/components/ui/textarea';
+import { Link } from 'expo-router';
 
 export default function ProfileScreen() {
   const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
@@ -46,11 +46,10 @@ export default function ProfileScreen() {
 
   const uploadImage = async () => {
     try {
-      await ImagePicker.requestMediaLibraryPermissionsAsync()
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
-        aspect: [1, 1],
         quality: 1,
       });
 
@@ -125,44 +124,17 @@ export default function ProfileScreen() {
               justifyContent: 'space-between', // Web-specific style
             }),
           }}>
-          <View className="gap-8" style={{ height: calculatedHeight + 50, backgroundColor: '' }}>
-            <Text size="2xl" className="text-center font-semibold uppercase text-black">
-              Profile
+          <View className="gap-8 py-8" style={{ backgroundColor: '' }}>
+            <Text size="4xl" className="text-center font-bold uppercase text-black">
+              Contact Us
             </Text>
 
-            <View style={{ flex: 0.4, backgroundColor: '' }}>
-              <View>
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-1 items-center">
-                    <View
-                      className="rounded-full bg-white"
-                      style={{
-                        width: profileImageSize, // Fixed size for the parent view
-                        height: profileImageSize,
-                        marginLeft: iconSize,
-                        overflow: 'hidden', // Ensures rounded corners clip the child content
-                        // alignItems: 'center', // Center content horizontally
-                        // justifyContent: 'center', // Center content vertically
-                      }}>
-                      <Image
-                        size={imageSize}
-                        style={{
-                          width: '100%', // Cover full width of the parent
-                          height: '100%', // Cover full height of the parent
-                        }}
-                        source={image?{uri:image}:require('assets/defaultUser.png')}
-                        alt="userImage"
-                      />
-                    </View>
-                  </View>
-                  <TouchableOpacity onPress={uploadImage}>
-                    <Upload size={iconSize} color={'black'} />
-                  </TouchableOpacity>
-                </View>
-                <Text size="lg" className="mt-[10] text-center text-black ">
-                  New Fashion
-                </Text>
-              </View>
+            <View style={{ flex: 0.2, backgroundColor: '' }}>
+              <Text size="lg" className="text-[#888888]">
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptates esse facere
+                eveniet, amet totam odit quod blanditiis. Odit sint eum nihil voluptas, atque enim?
+                Tenetur atque debitis amet rerum temporibus!
+              </Text>
             </View>
 
             <View className="flex-1" style={{ flex: 1, backgroundColor: '' }}>
@@ -261,6 +233,30 @@ export default function ProfileScreen() {
                     </Text>
                   </HStack>
                 </View>
+                <View>
+                  <Input
+                    variant="underlined"
+                    size="md"
+                    isDisabled={false}
+                    isInvalid={false}
+                    isReadOnly={false}
+                    className="min-w-[250px]">
+                    <InputField
+                      placeholder="Leave a comment..."
+                      onChangeText={(phoneNumber) => handleInputChange('phoneNumber', phoneNumber)}
+                      value={formData.phoneNumber}
+                      placeholderClassName="text-[#000000]"
+                    />
+                  </Input>
+                </View>
+                <Pressable onPress={uploadImage}>
+                  <View className="flex min-w-[250px] flex-row items-center border-b border-gray-300">
+                    <Image size={24} color={`${image?'black':"#888888"}`} />
+                    <Text numberOfLines={1}  className={`ml-2 text-sm ${image?'text-[#000000]':'text-[#888888]'}`}>
+                      {image || 'Choose a screenshot'}
+                    </Text>
+                  </View>
+                </Pressable>
               </FormControl>
             </View>
           </View>
@@ -272,6 +268,7 @@ export default function ProfileScreen() {
               justifyContent: 'flex-end',
               backgroundColor: '',
             }}>
+              <Link href={"/hh"}>click me</Link>
             <Button
               size="md"
               variant="solid"

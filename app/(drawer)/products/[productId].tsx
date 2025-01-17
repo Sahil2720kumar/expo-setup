@@ -1,4 +1,4 @@
-import { FlatList, Pressable, View } from 'react-native';
+import { FlatList, Pressable, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import { ScrollView } from 'react-native-virtualized-view';
 import { Text } from '~/components/ui/text';
@@ -56,10 +56,10 @@ const ProductDetailsScreen = () => {
       {/* <Stack.Screen options={{headerShown:false}}/> */}
       {/* TOP BUTTONS */}
       <View className=" mt-[14] flex-row items-center justify-between">
-        <Pressable onPress={()=>router.push("/(drawer)/products")}  className="flex-row gap-2">
+        <TouchableOpacity onPress={()=>router.push("/(drawer)/products")}  className="flex-row gap-2">
           <ChevronLeft color={'black'} />
           <Text className="text-lg font-medium text-black">Back</Text>
-        </Pressable>
+        </TouchableOpacity>
         <View className="flex-row items-center justify-between gap-2">
           <Heart color={'black'} />
           <Share2 color={'black'} />

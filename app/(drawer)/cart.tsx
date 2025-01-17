@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Minus, Plus } from 'lucide-react-native';
 import { Dimensions, Platform, TouchableOpacity, View } from 'react-native';
@@ -15,17 +16,18 @@ import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value'
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CartScreen() {
+  const router=useRouter()
   const {marginAuto,minWidth}=useCommonBreakPoints()
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
-
+  
+  const onHandleClick=()=>{
+    router.push("/(drawer)/checkout")
+  }
   
 
   const cartItems = [1, 2, 3, 4, 5, 6];
-  // <ScrollView
-  //       contentContainerStyle={{ flexGrow: 1, backgroundColor: '#000000',maxWidth:600, marginHorizontal: marginAuto, }} // Ensures scrolling when content overflows
-  //       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
-  //     ></ScrollView>
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -84,15 +86,18 @@ export default function CartScreen() {
           <Text className="w-[269] text-[#888888]">
             *shipping charges, taxes and discount codes are calculated at the time of accounting.
           </Text>
-
+         
           <Button
+            onPress={onHandleClick}
             size="md"
             variant="solid"
             className="rounded-[28] bg-[#F93C00]"
-            style={{ borderRadius: 28, height: 48 }}>
+            style={{ borderRadius: 28, height: 48 }}
+            >
             <Bag />
             <ButtonText size="lg">BUY NOW</ButtonText>
           </Button>
+          {/* <Text onPress={()=>console.log("ok")}>Press me</Text> */}
         </View>
       </View>
     </ScrollView>

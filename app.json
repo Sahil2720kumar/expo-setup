@@ -3,7 +3,7 @@
     "name": "dropsquad",
     "slug": "dropsquad",
     "version": "1.0.0",
-
+    "newArchEnabled": true,
     "scheme": "dropsquad",
     "web": {
       "bundler": "metro",
