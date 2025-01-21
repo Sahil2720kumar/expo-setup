@@ -58,7 +58,7 @@ export default function ShippingAddressScreen() {
           <View className="gap-[19] ">
             <Text className="font-semibold uppercase text-black">Shipping address</Text>
             <Link replace href={'/checkout/addAddress'} asChild>
-              <Pressable className="gap-0.5">
+              <TouchableOpacity activeOpacity={0.7} className="gap-0.5">
                 <View className="flex-row items-center justify-between">
                   <Text className="text-black">Iris Watson</Text>
                   <Pencil color={'black'} size={20} />
@@ -66,16 +66,16 @@ export default function ShippingAddressScreen() {
                 <Text className="w-[70%] text-[#888888]">
                   606-3727 Ullamcorper. Street Roseville NH 11523
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
             </Link>
             <Divider className="bg-[#F1F1F1]" />
             <Link href={'/checkout/addAddress'} asChild>
-              <Pressable className="flex-row justify-between rounded-[28]">
+              <TouchableOpacity activeOpacity={0.7} className="flex-row justify-between rounded-[28]">
                 <Text className="text-left font-medium font-semibold text-black" size="md">
                   Add shipping address
                 </Text>
                 <Plus size={24} color={'black'} />
-              </Pressable>
+              </TouchableOpacity>
             </Link>
           </View>
         </View>

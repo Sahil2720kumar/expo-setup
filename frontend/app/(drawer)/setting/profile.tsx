@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import {
   AlertCircleIcon,
+  ChevronLeft,
   ChevronRight,
   EyeIcon,
   EyeOffIcon,
@@ -27,9 +28,10 @@ import { Input, InputField, InputSlot, InputIcon } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 import addressSchema from '~/vaildators/addressSchema';
-import {profileSchema} from '~/vaildators/profileSchema';
+import { profileSchema } from '~/vaildators/profileSchema';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
 
 export default function ProfileScreen() {
   const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
@@ -46,7 +48,7 @@ export default function ProfileScreen() {
 
   const uploadImage = async () => {
     try {
-      await ImagePicker.requestMediaLibraryPermissionsAsync()
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
@@ -126,6 +128,16 @@ export default function ProfileScreen() {
             }),
           }}>
           <View className="gap-8" style={{ height: calculatedHeight + 50, backgroundColor: '' }}>
+            {/* TOP BUTTONS */}
+            <View className="flex-row items-center justify-between">
+              <TouchableOpacity
+                onPress={() => router.push('/(drawer)/setting')}
+                className="flex-row gap-2">
+                <ChevronLeft color={'black'} />
+                <Text className="text-lg font-medium text-black">Back</Text>
+              </TouchableOpacity>
+              <View className="flex-row items-center justify-between gap-2"></View>
+            </View>
             <Text size="2xl" className="text-center font-semibold uppercase text-black">
               Profile
             </Text>
@@ -150,7 +162,7 @@ export default function ProfileScreen() {
                           width: '100%', // Cover full width of the parent
                           height: '100%', // Cover full height of the parent
                         }}
-                        source={image?{uri:image}:require('assets/defaultUser.png')}
+                        source={image ? { uri: image } : require('assets/defaultUser.png')}
                         alt="userImage"
                       />
                     </View>

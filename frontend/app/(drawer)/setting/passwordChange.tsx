@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import {
   AlertCircleIcon,
+  ChevronLeft,
   ChevronRight,
   EyeIcon,
   EyeOffIcon,
@@ -30,6 +31,7 @@ import addressSchema from '~/vaildators/addressSchema';
 import profileSchema, { passwordChangeSchema } from '~/vaildators/profileSchema';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
 
 export default function PasswordChangeScreen() {
   const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
@@ -37,9 +39,9 @@ export default function PasswordChangeScreen() {
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   const [formData, setFormData] = useState({
-    currentPassword:'',
-    newPassword:"",
-    confirmNewPassword:""
+    currentPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -52,7 +54,6 @@ export default function PasswordChangeScreen() {
       [field]: value,
     }));
   };
-
 
   const handleSubmit = async () => {
     console.log('onSubmit...');
@@ -104,10 +105,20 @@ export default function PasswordChangeScreen() {
             }),
           }}>
           <View className="gap-8" style={{ height: calculatedHeight + 50, backgroundColor: '' }}>
+            {/* TOP BUTTONS */}
+            <View className="flex-row items-center justify-between">
+              <TouchableOpacity
+                onPress={() => router.push('/(drawer)/setting')}
+                className="flex-row gap-2">
+                <ChevronLeft color={'black'} />
+                <Text className="text-lg font-medium text-black">Back</Text>
+              </TouchableOpacity>
+              <View className="flex-row items-center justify-between gap-2"></View>
+            </View>
             <Text size="2xl" className="text-center font-semibold uppercase text-black">
               Profile
             </Text>
-            <View style={{flex:0.4}}/>
+            <View style={{ flex: 0.4 }} />
 
             <View className="flex-1" style={{ flex: 1, backgroundColor: '' }}>
               <FormControl
@@ -127,7 +138,9 @@ export default function PasswordChangeScreen() {
                     className="min-w-[50%] ">
                     <InputField
                       placeholder="Enter Current Password"
-                      onChangeText={(currentPassword) => handleInputChange('currentPassword', currentPassword)}
+                      onChangeText={(currentPassword) =>
+                        handleInputChange('currentPassword', currentPassword)
+                      }
                       value={formData.currentPassword}
                       placeholderClassName="text-[#000000]"
                     />
@@ -135,7 +148,9 @@ export default function PasswordChangeScreen() {
                   <HStack
                     className={`mt-1 ${errors.currentPassword ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
                     <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]">{errors.currentPassword ?? errors.currentPassword}</Text>
+                    <Text className="text-[#DC3545]">
+                      {errors.currentPassword ?? errors.currentPassword}
+                    </Text>
                   </HStack>
                 </View>
                 <View>
@@ -156,7 +171,10 @@ export default function PasswordChangeScreen() {
                   <HStack
                     className={`mt-1 ${errors.newPassword ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
                     <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]"> {errors.newPassword ?? errors.newPassword}</Text>
+                    <Text className="text-[#DC3545]">
+                      {' '}
+                      {errors.newPassword ?? errors.newPassword}
+                    </Text>
                   </HStack>
                 </View>
 
@@ -170,7 +188,9 @@ export default function PasswordChangeScreen() {
                     className="min-w-[250px]">
                     <InputField
                       placeholder="Confirm New Password"
-                      onChangeText={(confirmNewPassword) => handleInputChange('confirmNewPassword', confirmNewPassword)}
+                      onChangeText={(confirmNewPassword) =>
+                        handleInputChange('confirmNewPassword', confirmNewPassword)
+                      }
                       value={formData.confirmNewPassword}
                       placeholderClassName="text-[#000000]"
                     />
@@ -178,10 +198,12 @@ export default function PasswordChangeScreen() {
                   <HStack
                     className={`mt-1 ${errors.confirmNewPassword ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
                     <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]"> {errors.confirmNewPassword ?? errors.confirmNewPassword}</Text>
+                    <Text className="text-[#DC3545]">
+                      {' '}
+                      {errors.confirmNewPassword ?? errors.confirmNewPassword}
+                    </Text>
                   </HStack>
                 </View>
-
               </FormControl>
             </View>
           </View>

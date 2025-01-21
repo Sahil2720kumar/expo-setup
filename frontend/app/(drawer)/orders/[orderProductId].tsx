@@ -1,12 +1,13 @@
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import OrderTrackingBar from '~/components/OrderTrackingBar';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import { ScrollView } from 'react-native-virtualized-view';
 import { Text } from '~/components/ui/text';
-import { Truck } from 'lucide-react-native';
+import { ChevronLeft, Truck } from 'lucide-react-native';
 import { Divider } from '~/components/ui/divider';
 import OrderProductCard from '~/components/OrderProductCard';
+import { router } from 'expo-router';
 
 const OrderProductTrackingScreen = () => {
   const { minWidth, marginAuto } = useCommonBreakPoints();
@@ -34,7 +35,17 @@ const OrderProductTrackingScreen = () => {
         marginHorizontal: marginAuto,
       }} // Ensures scrolling when content overflows
       showsVerticalScrollIndicator={false}>
-      <View className='gap-y-[18]'>
+      <View className="gap-y-[18]">
+        {/* TOP BUTTONS */}
+        <View className=" mt-[14] flex-row items-center justify-between">
+          <TouchableOpacity
+            onPress={() => router.push('/(drawer)/orders')}
+            className="flex-row gap-2">
+            <ChevronLeft color={'black'} />
+            <Text className="text-lg font-medium text-black">Back</Text>
+          </TouchableOpacity>
+          <View className="flex-row items-center justify-between gap-2"></View>
+        </View>
         <View className="flex-row ">
           <View className="flex-1">
             <Text size="xl" className="font-bold text-black">
@@ -49,7 +60,7 @@ const OrderProductTrackingScreen = () => {
           </View>
           <View className="flex-1 flex-row gap-1">
             <Truck size={20} color={'#12B76A'} />
-            <View className="flex-row flex-wrap items-start">
+            <View className="sm:flex-col md:flex-row flex-wrap items-start">
               <Text className="text-[#12B76A]">Estimated delivery: </Text>
               <Text className="text-[#12B76A]">May 16, 2022</Text>
             </View>
@@ -60,15 +71,17 @@ const OrderProductTrackingScreen = () => {
           <OrderTrackingBar currentStep={currentStep} />
         </View>
         <View>
-          <OrderProductCard/>
+          <OrderProductCard />
         </View>
-        <Divider/>
+        <Divider />
         <View>
-          <Text size='lg' className='text-black font-semibold'>Delivery</Text>
-          <Text size='sm'>Address</Text>
-          <Text   className='text-[#888888] '>847 Jewess Bridge Apt.</Text>
-          <Text className='text-[#888888]'>174 London, UK</Text>
-          <Text className='text-[#888888]'>474-769-3919</Text>
+          <Text size="lg" className="font-semibold text-black">
+            Delivery
+          </Text>
+          <Text size="sm">Address</Text>
+          <Text className="text-[#888888] ">847 Jewess Bridge Apt.</Text>
+          <Text className="text-[#888888]">174 London, UK</Text>
+          <Text className="text-[#888888]">474-769-3919</Text>
         </View>
       </View>
     </ScrollView>

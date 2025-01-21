@@ -268,7 +268,7 @@ export default function ProfileScreen() {
               justifyContent: 'flex-end',
               backgroundColor: '',
             }}>
-              <Link href={"/hh"}>click me</Link>
+              {/* <Link href={"/hh"}>click me</Link> */}
             <Button
               size="md"
               variant="solid"
