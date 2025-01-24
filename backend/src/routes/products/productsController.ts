@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../../db/index";
-import { insertProductSchema, products } from "../../db/schema";
+import { insertProductSchema, products } from "../../db/productsSchema";
 import { eq } from "drizzle-orm";
 import _ from "lodash"
 
@@ -36,6 +36,7 @@ const getProductById = async (req: Request, res: Response) => {
 
 const insertProduct = async (req: Request, res: Response) => {  
   try {
+    // console.log(req.userId)
     const [newInsertedProduct] = await db
       .insert(products)
       .values(req.cleanBody)

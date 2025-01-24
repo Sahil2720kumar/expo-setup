@@ -1,7 +1,9 @@
 import { Router } from "express"
 import { deleteProduct, getProductById, insertProduct, listOfProducts, updateProduct } from "./productsController"
 import { validateData } from "../../middlewares/validationMiddleware"
-import { insertProductSchema, products, updateProductSchema } from "../../db/schema";
+import { insertProductSchema, products, updateProductSchema } from "../../db/productsSchema";
+import {verifyToken} from "../../middlewares/authMiddleware"
+import { verifyAuthorizaion } from "../../middlewares/authorizationMiddleware";
 
 // Using Zod schema
 
@@ -30,8 +32,8 @@ const router=Router()
 
 router.get("/",listOfProducts)
 router.get("/:id",getProductById)
-router.post("/",validateData(insertProductSchema),insertProduct)
-router.put("/:id",validateData(updateProductSchema),updateProduct)
-router.delete("/:id",deleteProduct) 
+router.post("/",verifyToken,verifyAuthorizaion,validateData(insertProductSchema),insertProduct)
+router.put("/:id",verifyToken,verifyAuthorizaion,validateData(updateProductSchema),updateProduct)
+router.delete("/:id",verifyToken,verifyAuthorizaion,deleteProduct) 
 
 export default router;
