@@ -1,9 +1,9 @@
 import { Router } from "express"
-import { deleteProduct, getProductById, insertProduct, listOfProducts, updateProduct } from "./productsController"
-import { validateData } from "../../middlewares/validationMiddleware"
-import { insertProductSchema, products, updateProductSchema } from "../../db/productsSchema";
-import {verifyToken} from "../../middlewares/authMiddleware"
-import { verifyAuthorizaion } from "../../middlewares/authorizationMiddleware";
+import { deleteProduct, getProductById, insertProduct, listOfProducts, updateProduct } from "./productsController.js"
+import { validateData } from "../../middlewares/validationMiddleware.js"
+import { insertProductSchema, products, updateProductSchema } from "../../db/productsSchema.js";
+import {verifyToken} from "../../middlewares/authMiddleware.js"
+import { verifyAuthorizaion } from "../../middlewares/authorizationMiddleware.js";
 
 // Using Zod schema
 
