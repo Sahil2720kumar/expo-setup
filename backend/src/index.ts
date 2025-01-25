@@ -20,10 +20,10 @@ app.get("/", (req, res) => {
 });
 
 // You don't need to listen to the port when using serverless functions in production
-// if (process.env.NODE_ENV === "dev") {
+if (process.env.NODE_ENV === "dev") {
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
   });
-// }
+}
 
-// export const handler = serverless(app);
+export const handler = serverless(app);
