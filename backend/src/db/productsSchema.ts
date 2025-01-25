@@ -12,7 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 
-export const products = pgTable("products", {
+export const productsTable = pgTable("products", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   category: varchar({ length: 255 }).notNull(),
   subcategory: varchar({ length: 255 }).notNull(),
@@ -27,7 +27,7 @@ export const products = pgTable("products", {
 });
 
 // using Drizzle createInsertSchema to create Zod schema (products)
-export const insertProductSchema = createInsertSchema(products).omit({})
-export const updateProductSchema = createUpdateSchema(products).omit({})
+export const insertProductSchema = createInsertSchema(productsTable).omit({})
+export const updateProductSchema = createUpdateSchema(productsTable).omit({})
 
  

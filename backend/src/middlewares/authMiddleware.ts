@@ -21,10 +21,6 @@ export const verifyToken = async (
       return;
     }
 
-    if (decoded?.role !== "admin") {
-      res.status(401).json({ error: "You don't have permission to add a product" });
-      return;
-    }
 
     req.userId = decoded.userId;
     next();

@@ -1,6 +1,7 @@
 import express, { json, urlencoded } from "express";
 import productsRoutes from "./routes/products/index.js";
 import authRoutes from "./routes/auth/index.js";
+import ordersRoutes from "./routes/orders/index.js";
 import serverless from "serverless-http";
 
 const app = express();
@@ -14,6 +15,9 @@ app.use(urlencoded({ extended: false }));
 app.use("/products", productsRoutes);
 //Auth apis
 app.use("/auth", authRoutes);
+//orders apis
+app.use("/orders", ordersRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("Hello World! 766");

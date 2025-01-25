@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { db } from "../../db/index.js";
-import { users } from "../../db/usersSchema.js";
+import { usersTable } from "../../db/usersSchema.js";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 
@@ -15,8 +15,8 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const [emailAlreadyExist] = await db
       .select()
-      .from(users)
-      .where(eq(users.email, data.email));
+      .from(usersTable)
+      .where(eq(usersTable.email, data.email));
 
     if (emailAlreadyExist) {
       res.status(400).json({ message: "Email already exists", status: 400 });
@@ -24,7 +24,7 @@ export const registerUser = async (req: Request, res: Response) => {
     }
 
     const [user] = await db
-      .insert(users)
+      .insert(usersTable)
       .values({ ...data, password: hashedPassword })
       .returning();
 
@@ -48,8 +48,8 @@ export const loginUser = async (req: Request, res: Response) => {
     // Fetch user and validate
     const [userExist] = await db
       .select()
-      .from(users)
-      .where(eq(users.email, email));
+      .from(usersTable)
+      .where(eq(usersTable.email, email));
 
     if (!userExist || !bcrypt.compareSync(password, userExist.password)) {
       res.status(401).json({ message: "Invalid credentials", status: 401 });
@@ -76,6 +76,7 @@ export const loginUser = async (req: Request, res: Response) => {
         user: userExist,
       });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: "Failed to login user", status: 500 });
   }
 };

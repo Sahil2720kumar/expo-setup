@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
 import { db } from "../../db/index.js";
-import { insertProductSchema, products } from "../../db/productsSchema.js";
+import { insertProductSchema, productsTable } from "../../db/productsSchema.js";
 import { eq } from "drizzle-orm";
 import _ from "lodash"
 
 const listOfProducts = async (req: Request, res: Response) => {
   try {
-    const productsList = await db.select().from(products);
+    const productsList = await db.select().from(productsTable);
     res.status(200).json(productsList);
   } catch (err) {
     res
       .status(500)
-      .json({ message: "Failed to fetch all the products", status: 500 });
+      .json({ message: "Failed to fetch all the productsTable", status: 500 });
   }
 };
 
@@ -20,8 +20,8 @@ const getProductById = async (req: Request, res: Response) => {
   try {
     const [product] = await db
       .select()
-      .from(products)
-      .where(eq(products.id, Number(req.params.id)));
+      .from(productsTable)
+      .where(eq(productsTable.id, Number(req.params.id)));
 
     if (!product) {
       res.status(404).json({ message: "Product not found", status: 404 });
@@ -38,7 +38,7 @@ const insertProduct = async (req: Request, res: Response) => {
   try {
     // console.log(req.userId)
     const [newInsertedProduct] = await db
-      .insert(products)
+      .insert(productsTable)
       .values(req.cleanBody)
       .returning();
 
@@ -55,7 +55,7 @@ const updateProduct = async(req: Request, res: Response) => {
    try {
       const id = Number(req.params.id);
       const updatedFields=req.cleanBody
-      const [product] = await db.update(products).set(updatedFields).where(eq(products.id,id)).returning()
+      const [product] = await db.update(productsTable).set(updatedFields).where(eq(productsTable.id,id)).returning()
   
      
       if (!product) {
@@ -78,8 +78,8 @@ const deleteProduct = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     const [deletedProduct] = await db
-      .delete(products)
-      .where(eq(products.id, id))
+      .delete(productsTable)
+      .where(eq(productsTable.id, id))
       .returning();
 
    
