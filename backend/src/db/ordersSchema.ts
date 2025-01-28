@@ -7,11 +7,12 @@ import {
   serial,
   varchar,
 } from "drizzle-orm/pg-core";
-import { usersTable } from "./usersSchema";
-import { productsTable } from "./productsSchema";
+import { usersTable } from "./usersSchema.js";
+import { productsTable } from "./productsSchema.js";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
+import { type InferSelectModel  } from "drizzle-orm";
 
 
 export const ordersTable = pgTable("orders", {
@@ -38,6 +39,11 @@ export const orderItemsTable = pgTable("order_items", {
   price: doublePrecision().notNull(),
   deliveryDate: date("delivery_date").default(sql`null`),
 });
+
+//Table types
+export type OrderItemsType = InferSelectModel<typeof orderItemsTable>; 
+
+
 
 export const insertOrderSchema=createInsertSchema(ordersTable).omit({
     customerId:true,

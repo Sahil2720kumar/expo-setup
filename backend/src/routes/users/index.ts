@@ -7,11 +7,11 @@ import {
   listOfAddresses,
   updateAddress,
   updateUser,
-} from "./usersController";
-import { verifyToken } from "../../middlewares/authMiddleware";
-import { validateData } from "../../middlewares/validationMiddleware";
-import { insertAddressSchema, updateAddressSchema, updateUserSchema } from "../../db/usersSchema";
-import { verifyAuthorizaion } from "../../middlewares/authorizationMiddleware";
+} from "./usersController.js";
+import { verifyToken } from "../../middlewares/authMiddleware.js";
+import { validateData } from "../../middlewares/validationMiddleware.js";
+import { insertAddressSchema, updateAddressSchema, updateUserSchema } from "../../db/usersSchema.js";
+import { verifyAuthorizaion } from "../../middlewares/authorizationMiddleware.js";
 
 const router = Router();
 

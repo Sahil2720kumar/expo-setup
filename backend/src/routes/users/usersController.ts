@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { db } from "../../db";
-import { addressesTable, usersTable } from "../../db/usersSchema";
+import { db } from "../../db/index.js";
+import { addressesTable, usersTable } from "../../db/usersSchema.js";
 import { eq, getTableColumns } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export const listOfAddresses = async (req: Request, res: Response) => {
   try {
-    console.log("user role: ", req.role);
+    // console.log("user role: ", req.role);
 
     const addressesList = await db
       .select()
@@ -74,7 +74,7 @@ export const updateAddress = async (req: Request, res: Response) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res
       .status(500)
       .json({ message: "Failed to update a address", status: 500 });
@@ -85,7 +85,7 @@ export const updateAddress = async (req: Request, res: Response) => {
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    console.log("user role: ", req.role);
+    // console.log("user role: ", req.role);
     const { password, ...rest } = getTableColumns(usersTable);
 
     // const allUsers = await db.select({ ...rest }).from(usersTable);
@@ -100,7 +100,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
 
     res.status(200).json(allUsers);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
 
     res
       .status(500)
@@ -144,11 +144,11 @@ export const updateUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
     let updatedFields = req.cleanBody;
 
-    console.log("paramsUserID", userId);
-    console.log("tokenUserId", req.userId);
+    // console.log("paramsUserID", userId);
+    // console.log("tokenUserId", req.userId);
 
     if (updatedFields.password) {
-      console.log(updatedFields);
+      // console.log(updatedFields);
       const hashedPassword = await bcrypt.hashSync(
         updatedFields.password,
         Number(process.env.BCRYPT_SALT)
@@ -179,7 +179,7 @@ export const updateUser = async (req: Request, res: Response) => {
       status: 204,
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json({ message: "Failed to update a user", status: 500 });
   }
 };

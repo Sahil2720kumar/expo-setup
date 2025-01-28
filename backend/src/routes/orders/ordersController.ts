@@ -3,10 +3,11 @@ import {
   insertOrderItemSchema,
   ordersTable,
   orderItemsTable,
+  OrderItemsType,
 } from "../../db/ordersSchema.js";
 import { db } from "../../db/index.js";
 import _ from "lodash";
-import { productsTable } from "../../db/productsSchema.js";
+import { ProductType, productsTable } from "../../db/productsSchema.js";
 import { eq, inArray } from "drizzle-orm";
 
 export const insertOrder = async (req: Request, res: Response) => {
@@ -18,7 +19,7 @@ export const insertOrder = async (req: Request, res: Response) => {
     };
 
     //Add price to each order item
-    const productIds = data.items.map((product) => product.productId);
+    const productIds = data.items.map((product:OrderItemsType) => product.productId);
     const productsList = await db
       .select()
       .from(productsTable)
@@ -29,7 +30,7 @@ export const insertOrder = async (req: Request, res: Response) => {
       return product ? product.price : null; // Return the price or null if not found
     }
 
-    const totalPrice = data.items.reduce((total: number, product) => {
+    const totalPrice = data.items.reduce((total: number, product:OrderItemsType) => {
       const productPrice = findProductPrice(product.productId);
       return total + (productPrice ?? 0) * product.quantity; // Multiply price by quantity
     }, 0); // Start with 0 as the initial total
@@ -40,12 +41,12 @@ export const insertOrder = async (req: Request, res: Response) => {
       .values({ ...data.order, totalAmount: totalPrice })
       .returning();
 
-    const orderItems = data.items.map((item) => {
+    const orderItems = data.items.map((item:OrderItemsType) => {
       const clean_item = _.pick(item, Object.keys(insertOrderItemSchema.shape));
       return {
         ...clean_item,
         orderId: newInsertedOrder.id,
-        price: findProductPrice(clean_item.productId),
+        price: findProductPrice(clean_item.productId!),
       };
     });
 

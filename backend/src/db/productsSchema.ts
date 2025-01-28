@@ -10,6 +10,7 @@ import {
   text,
   varchar,
 } from "drizzle-orm/pg-core";
+import { type InferSelectModel  } from "drizzle-orm";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 
 export const productsTable = pgTable("products", {
@@ -30,4 +31,6 @@ export const productsTable = pgTable("products", {
 export const insertProductSchema = createInsertSchema(productsTable).omit({})
 export const updateProductSchema = createUpdateSchema(productsTable).omit({})
 
+
+export type ProductType = InferSelectModel<typeof productsTable>; // Represents a row in the table
  
