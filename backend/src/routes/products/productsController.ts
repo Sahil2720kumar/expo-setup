@@ -3,7 +3,7 @@ import { db } from "../../db/index.js";
 import { insertProductSchema, productsTable } from "../../db/productsSchema.js";
 import { eq } from "drizzle-orm";
 import _ from "lodash"
-
+ 
 const listOfProducts = async (req: Request, res: Response) => {
   try {
     const productsList = await db.select().from(productsTable);

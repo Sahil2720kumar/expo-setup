@@ -13,7 +13,7 @@ export const verifyAuthorizaion = async (
     const decoded = Jwt.verify(token, process.env.JWT_SECRET_TOKEN!);
 
     if (typeof decoded !== "object" ||decoded?.role !== "admin") {
-      res.status(401).json({ error: "You don't have permission to add a product" });
+      res.status(401).json({ error: "You don't have permission!" });
       return;
     }
 

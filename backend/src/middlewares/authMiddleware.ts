@@ -23,6 +23,7 @@ export const verifyToken = async (
 
 
     req.userId = decoded.userId;
+    req.role=decoded.role
     next();
   } catch (err) {
     res.status(401).json({ error: "Access denied" });

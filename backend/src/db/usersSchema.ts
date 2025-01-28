@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
   serial,
@@ -39,6 +39,7 @@ export const createUserSchema = createInsertSchema(usersTable).omit({
 });
 export const updateUserSchema = createUpdateSchema(usersTable).omit({
   role: true,
+  email: true,
   isActive: true,
   createdAt: true,
   updatedAt: true,
@@ -54,10 +55,34 @@ export const loginUserSchema = createSelectSchema(usersTable).pick({
 export const addressesTable = pgTable("addresses", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   userId: integer("user_id")
-    .notNull()
-    .references(() => usersTable.id),
+    .references(() => usersTable.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   street: varchar("street", { length: 255 }).notNull(),
   city: varchar("city", { length: 100 }).notNull(),
   state: varchar("state", { length: 100 }).notNull(),
   zip: varchar("zip", { length: 20 }).notNull(),
 });
+
+//Addresses Schema
+export const insertAddressSchema = createInsertSchema(addressesTable).omit({
+  userId: true,
+});
+
+export const updateAddressSchema = createUpdateSchema(addressesTable).omit({
+  userId: true,
+});
+
+//Relations
+
+export const usersTableRelations = relations(usersTable, ({ many }) => ({
+  addresses: many(addressesTable),
+}));
+
+export const addressesTableRelations = relations(addressesTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [addressesTable.userId],
+    references: [usersTable.id],
+  }),
+}));

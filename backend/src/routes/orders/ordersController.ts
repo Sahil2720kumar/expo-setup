@@ -64,8 +64,18 @@ export const insertOrder = async (req: Request, res: Response) => {
 
 export const listOfOrders = async (req: Request, res: Response) => {
   try {
-    const orders = await db.select().from(ordersTable);
+    if (req.role === "admin") {
+      const orders = await db.select().from(ordersTable);
+      res.status(200).json(orders);
+      return;
+    }
+
+    const orders = await db
+      .select()
+      .from(ordersTable)
+      .where(eq(ordersTable.customerId, Number(req.userId)));
     res.status(200).json(orders);
+    
   } catch (err) {
     console.log(err);
     res
@@ -87,11 +97,11 @@ export const getOrderById = async (req: Request, res: Response) => {
       return;
     }
 
-    const orderItems=orderWithItems.map(({orders,order_items})=>{
-      return order_items
-    })
+    const orderItems = orderWithItems.map(({ orders, order_items }) => {
+      return order_items;
+    });
 
-    res.status(200).json({...orderWithItems[0].orders,items:orderItems});
+    res.status(200).json({ ...orderWithItems[0].orders, items: orderItems });
   } catch (err) {
     console.log(err);
 
