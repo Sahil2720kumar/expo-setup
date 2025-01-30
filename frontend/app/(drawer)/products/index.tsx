@@ -1,28 +1,59 @@
-import { View } from 'react-native';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { LayoutList } from 'lucide-react-native';
 import React, { useState } from 'react';
+import { View, FlatList, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
-import { Text } from '~/components/ui/text';
-import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
-import { Filter, Heart, LayoutList, Share2 } from 'lucide-react-native';
-import { Button, ButtonIcon } from '~/components/ui/button';
-import FilterDrawer from '~/components/FilterDrawer';
-import { FlatList } from 'react-native';
+
 import { products } from '@/assets/data/product.json';
-import ProductCard from '~/components/ProductCard';
-import Pagination from '~/components/Pagination';
+import { getAllProducts } from '~/api/products';
+import FilterDrawer from '~/components/FilterDrawer';
 import Footer from '~/components/Footer';
-import { Stack } from 'expo-router';
+import Pagination from '~/components/Pagination';
+import ProductCard from '~/components/ProductCard';
+import { Button } from '~/components/ui/button';
+import { Text } from '~/components/ui/text';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 const ProductsScreen = () => {
-  // console.log('category screen re render');
-  const { marginAuto, minWidth, iconProductSize:iconSize, noColumns } = useCommonBreakPoints();
-
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10; // Example total number of pages
+  // const totalPages = 10; // Example total number of pages
+  const { marginAuto, minWidth, iconProductSize: iconSize, noColumns } = useCommonBreakPoints();
+   
+  const { data:productsData,isPlaceholderData, isLoading, error } = useQuery({
+    queryKey: ['products',currentPage],
+    queryFn: () => getAllProducts(currentPage),
+    placeholderData: keepPreviousData
+  });
+ 
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator size={'large'} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View
+        style={{
+          height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{error.message}</Text>
+      </View>
+    );
+  }
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+    
     // Here you would typically fetch data for the new page
     console.log(`Fetching data for page ${newPage}`);
   };
@@ -39,7 +70,7 @@ const ProductsScreen = () => {
         paddingHorizontal: 15,
         paddingTop: 15,
         maxWidth: 600,
-        minWidth: minWidth,
+        minWidth,
         marginHorizontal: marginAuto,
         backgroundColor: 'white',
       }}
@@ -73,10 +104,11 @@ const ProductsScreen = () => {
               className="w-full items-center"
               columnWrapperClassName={`gap-y-2 ${noColumns !== 2 ? 'gap-x-4' : 'gap-x-2'}`}
               numColumns={noColumns}
-              data={products.slice(0, 6)}
+              data={productsData.productsList.slice(0, 6)}
               renderItem={({ item }) => (
                 <ProductCard
                   key={item.id}
+                  name={item.name}
                   description={item.description}
                   price={item.price}
                   id={item.id}
@@ -86,9 +118,9 @@ const ProductsScreen = () => {
           </View>
           <View className="pt-[32] md:pt-11  ">
             <Pagination
-              // currentPage={currentPage}
-              totalPages={totalPages}
-              // onPageChange={handlePageChange}
+               currentPage={currentPage}
+              totalPages={Math.ceil(productsData.totalProductsCount/6)}
+              onPageChange={handlePageChange}
             />
           </View>
         </View>

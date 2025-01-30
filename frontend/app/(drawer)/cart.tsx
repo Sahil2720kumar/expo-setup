@@ -13,11 +13,14 @@ import { Button, ButtonText } from '~/components/ui/button';
 import { Image } from '~/components/ui/image';
 import { Text } from '~/components/ui/text';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
+import useCartStore from '~/store/store';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CartScreen() {
   const router=useRouter()
   const {marginAuto,minWidth}=useCommonBreakPoints()
+  const {products:cartItems,addProduct,reduceProduct,totalPrice}=useCartStore()
+
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   
@@ -25,8 +28,6 @@ export default function CartScreen() {
     router.push("/(drawer)/checkout")
   }
   
-
-  const cartItems = [1, 2, 3, 4, 5, 6];
 
   return (
     <ScrollView
@@ -64,7 +65,7 @@ export default function CartScreen() {
           <View className="flex-1 justify-center">
             <FlatList
               data={cartItems.slice(0,5)}
-              renderItem={({ item }) => <CartItem key={item} />}
+              renderItem={({ item }) => <CartItem key={item.id} item={item} />}
               contentContainerClassName="gap-6"
               scrollEnabled
               showsVerticalScrollIndicator={false}
@@ -80,7 +81,7 @@ export default function CartScreen() {
               SUB TOTAL
             </Text>
             <Text size="xl" className="font-bold text-[#F93C00]">
-              $179
+            ₹ {totalPrice.toFixed(2)}
             </Text>
           </View>
           <Text className="w-[269] text-[#888888]">
@@ -88,7 +89,7 @@ export default function CartScreen() {
           </Text>
          
           <Button
-            onPress={onHandleClick}
+            onPress={()=>router.push("/(drawer)/checkout")}
             size="md"
             variant="solid"
             className="rounded-[28] bg-[#F93C00]"

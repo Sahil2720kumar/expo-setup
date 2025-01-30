@@ -7,10 +7,19 @@ import { Text } from './ui/text';
 import { Image } from 'react-native';
 import { Link } from 'expo-router';
 
-export default function ProductCard({ description = '', rating = '', price = '', id = 1 }) {
+export default function ProductCard({
+  name = '',
+  description = '',
+  rating = '',
+  price = '',
+  id = 1,
+}) {
   return (
     <Link href={`/(drawer)/products/${id}`} asChild>
-      <TouchableOpacity activeOpacity={0.8} className="rounded-lg" style={{ width: 168, marginTop: 20, backgroundColor: '' }}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        className="rounded-lg"
+        style={{ width: 168, marginTop: 20, backgroundColor: '' }}>
         <View style={{ width: '100%', height: 190, borderRadius: 5 }}>
           <Image
             resizeMode="cover"
@@ -19,7 +28,7 @@ export default function ProductCard({ description = '', rating = '', price = '',
           />
         </View>
         <View className="mt-1.5">
-          <Text className="text-black">Short sleeve polo shirt</Text>
+          <Text className="text-black">{name}</Text>
           <Text
             style={{ display: description !== '' ? 'flex' : 'none' }}
             numberOfLines={1}

@@ -1,12 +1,12 @@
 import '../global.css';
 
-import { Slot, Stack, Tabs } from 'expo-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { StyleSheet, StatusBar as rnStatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 import { GluestackUIProvider } from '~/components/ui/gluestack-ui-provider';
-import { Text } from '~/components/ui/text';
-import { StatusBar as rnStatusBar } from "react-native"
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -14,14 +14,17 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  const queryClient = new QueryClient();
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GluestackUIProvider>
-        <Stack>
-          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-          {/* <Stack.Screen name="cart" options={{ title: 'Cart', presentation: 'modal' }} /> */}
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <QueryClientProvider client={queryClient}>
+          <Stack>
+            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+            {/* <Stack.Screen name="cart" options={{ title: 'Cart', presentation: 'modal' }} /> */}
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </QueryClientProvider>
         <StatusBar style="auto" />
       </GluestackUIProvider>
     </GestureHandlerRootView>

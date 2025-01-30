@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 
+
 // Get the valid names for Feather icons
 type FeatherIconName = keyof typeof Feather.glyphMap;
 
@@ -16,7 +17,6 @@ export const HeaderButton = forwardRef<
         <Feather
           name={iconName}
           size={24}
-          color={iconName}
           style={[
             styles.headerRight,
             {

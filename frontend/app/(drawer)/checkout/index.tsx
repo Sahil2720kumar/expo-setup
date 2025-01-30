@@ -1,33 +1,28 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Minus, Package, Plus } from 'lucide-react-native';
-import { Dimensions, Platform, TouchableOpacity, View } from 'react-native';
+import {  Package } from 'lucide-react-native';
+import { Dimensions, Platform, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-virtualized-view';
 // import { ScrollView } from 'react-native';
 import CartItem from '~/components/CartItem';
 import { Bag } from '~/components/Icons';
 
-import { ScreenContent } from '~/components/ScreenContent';
 import { Button, ButtonText } from '~/components/ui/button';
-import { Image } from '~/components/ui/image';
 import { Text } from '~/components/ui/text';
-import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
+import useCartStore from '~/store/store';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CheckoutScreen() {
+  const {products:cartItems,addProduct,reduceProduct,totalPrice}=useCartStore()
+
+
+  
   const router=useRouter()
   const {marginAuto,minWidth}=useCommonBreakPoints()
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
 
-  
-
-  const cartItems = [1, 2, 3, 4, 5, 6];
-  // <ScrollView
-  //       contentContainerStyle={{ flexGrow: 1, backgroundColor: '#000000',maxWidth:600, marginHorizontal: marginAuto, }} // Ensures scrolling when content overflows
-  //       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
-  //     ></ScrollView>
   return (
     <ScrollView
       contentContainerStyle={{
@@ -63,7 +58,7 @@ export default function CheckoutScreen() {
           <View className="flex-1 justify-center">
             <FlatList
               data={cartItems.slice(0, 5)}
-              renderItem={({ item }) => <CartItem key={item} />}
+              renderItem={({ item }) => <CartItem key={item.id} item={item} />}
               contentContainerClassName="gap-6"
               scrollEnabled
               showsVerticalScrollIndicator={false}
@@ -86,7 +81,7 @@ export default function CheckoutScreen() {
               Est. Total
             </Text>
             <Text size="lg" className="font-bold text-[#F93C00]">
-              $179
+            ₹ {totalPrice.toFixed(2)}
             </Text>
           </View>
 

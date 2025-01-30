@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { View, FlatList, StyleSheet, Platform } from 'react-native';
+import React, { useState, useRef, memo } from 'react';
+import { View, FlatList, StyleSheet, Platform, Image } from 'react-native';
+import clothImage from './../assets/cloth.png';
 import { Button, ButtonText } from './ui/button';
 import { Text } from './ui/text';
-import clothImage from './../assets/cloth.png';
-import { Image } from 'react-native';
 // import { Image } from './ui/image';
 
+//Memo not work in this case
 const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -126,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Carousel;
+export default memo(Carousel);
