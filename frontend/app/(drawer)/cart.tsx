@@ -13,7 +13,7 @@ import { Button, ButtonText } from '~/components/ui/button';
 import { Image } from '~/components/ui/image';
 import { Text } from '~/components/ui/text';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
-import useCartStore from '~/store/store';
+import useCartStore from '~/store/cartStore';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CartScreen() {

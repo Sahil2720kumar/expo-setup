@@ -17,7 +17,8 @@ import { useCommonBreakPoints } from '~/utils/breakPoints';
 import { getProductById } from '~/api/products';
 import { useQuery } from '@tanstack/react-query';
 import { Product } from '~/types';
-import useCartStore from '~/store/store';
+import useCartStore from '~/store/cartStore';
+import useAuthStore from '~/store/authStore';
 
 const ProductDetailsScreen = () => {
   const { productId } = useLocalSearchParams();
@@ -32,6 +33,7 @@ const ProductDetailsScreen = () => {
   const [selectedColor, setSelectedColor] = useState('393944');
   const [selectedSize, setSelectedSize] = useState('S');
   const { addProduct, products } = useCartStore();
+  const {sessionUser,sessionToken}=useAuthStore()
   const isAlreadyInCart = products.find((product) => product.id === Number(productId));
   // console.log('productID', productId);
   // console.log('isAlreadyInvar', isAlreadyInCart);
@@ -62,6 +64,9 @@ const ProductDetailsScreen = () => {
   });
 
   const addToCart = () => {
+    if(!sessionUser || !sessionToken){
+      router.push("/(drawer)/(auth)/signIn")
+    }
     addProduct(productData!);
   };
 
@@ -131,8 +136,7 @@ const ProductDetailsScreen = () => {
           {/* BASIS PRODUCT INFORMATION */}
           <View className="mt-4 h-[100] flex-row items-center justify-between">
             <View className="flex-1 gap-0.5">
-              <Text className="w-full text-2xl font-bold text-black">id #{productData?.id}</Text>
-              <Text className="w-full text-2xl font-bold text-black">{productData?.name}</Text>
+              <Text className="w-full text-2xl font-bold text-black">{productData?.name}  id #{productData?.id}</Text>
               <Text
                 numberOfLines={2}
                 ellipsizeMode="tail"
@@ -151,11 +155,12 @@ const ProductDetailsScreen = () => {
           </View>
 
           {/* COLOR AND SIZE SECTION */}
-          <View className="flex flex-row items-center justify-between gap-3">
-            <View className="flex-row items-center gap-3">
+          <View className="flex flex-row gap-3 items-center justify-between" style={{marginTop:18}}>
+            <View className="flex-row gap-2 flex-1" >
               <Text className="text-[#888888]">Color</Text>
               {productData?.color.map((color) => (
                 <TouchableOpacity
+                key={color}
                   activeOpacity={0.7}
                   className=" h-[26] w-[26] rounded-[12]  border-2 border-[#888888] p-0.5">
                   <View
@@ -165,10 +170,10 @@ const ProductDetailsScreen = () => {
                 </TouchableOpacity>
               ))}
             </View>
-            <View className="flex-row items-center justify-between gap-3 ">
+            <View className="flex-row items-center justify-between gap-2 flex-wrap ">
               <Text className="text-[#888888]">Size</Text>
-              {productData?.size.map((size) => (
-                <View className="h-[26] w-[26] items-center justify-center rounded-[13] bg-[#F93C00]">
+              {productData?.size.map((size,index) => (
+                <View key={index} className="h-[26] w-[26] items-center justify-center rounded-[13] bg-[#F93C00]">
                   <Text className="font-semibold text-white">{size}</Text>
                 </View>
               ))}

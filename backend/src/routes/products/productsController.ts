@@ -1,20 +1,32 @@
 import { Request, Response } from "express";
 import { db } from "../../db/index.js";
 import { insertProductSchema, productsTable } from "../../db/productsSchema.js";
-import { eq } from "drizzle-orm";
-import _ from "lodash"
- 
+import { count, desc, eq } from "drizzle-orm";
+import _ from "lodash";
+import products from "./index.js";
+
 const listOfProducts = async (req: Request, res: Response) => {
   try {
-    const productsList = await db.select().from(productsTable);
-    res.status(200).json(productsList);
+    const { page, pageSize } = req.query;
+    // console.log({ page, pageSize });
+
+    const productsList = await db.query.productsTable.findMany({
+      orderBy: (users, { asc }) => asc(productsTable.id),
+      limit: Number(pageSize),
+      offset: (Number(page) - 1) * Number(pageSize),
+    });
+     
+    const totalProductsCount = await db.select({ count: count() }).from(productsTable);
+     
+    res.status(200).json({totalProductsCount:totalProductsCount[0].count,productsList});
   } catch (err) {
+    // console.log(err);
+    
     res
       .status(500)
       .json({ message: "Failed to fetch all the productsTable", status: 500 });
   }
 };
-
 
 const getProductById = async (req: Request, res: Response) => {
   try {
@@ -33,8 +45,7 @@ const getProductById = async (req: Request, res: Response) => {
   }
 };
 
-
-const insertProduct = async (req: Request, res: Response) => {  
+const insertProduct = async (req: Request, res: Response) => {
   try {
     // console.log(req.userId)
     const [newInsertedProduct] = await db
@@ -50,28 +61,30 @@ const insertProduct = async (req: Request, res: Response) => {
   }
 };
 
+const updateProduct = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const updatedFields = req.cleanBody;
+    const [product] = await db
+      .update(productsTable)
+      .set(updatedFields)
+      .where(eq(productsTable.id, id))
+      .returning();
 
-const updateProduct = async(req: Request, res: Response) => {
-   try {
-      const id = Number(req.params.id);
-      const updatedFields=req.cleanBody
-      const [product] = await db.update(productsTable).set(updatedFields).where(eq(productsTable.id,id)).returning()
-  
-     
-      if (!product) {
-        res.status(404).json({ message: "Product not found", status: 404 });
-      } else {
-        res.status(200).json({
-          message: "Product updated successfull",
-          status: 204,
-        });
-      }
-    } catch (err) {
-      console.log(err)
-      res
-        .status(500)
-        .json({ message: "Failed to update a product", status: 500 });
+    if (!product) {
+      res.status(404).json({ message: "Product not found", status: 404 });
+    } else {
+      res.status(200).json({
+        message: "Product updated successfull",
+        status: 204,
+      });
     }
+  } catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .json({ message: "Failed to update a product", status: 500 });
+  }
 };
 
 const deleteProduct = async (req: Request, res: Response) => {
@@ -82,14 +95,13 @@ const deleteProduct = async (req: Request, res: Response) => {
       .where(eq(productsTable.id, id))
       .returning();
 
-   
     if (!deletedProduct) {
       res.status(404).json({ message: "Product not found", status: 404 });
     } else {
       res.status(200).json({
         message: "Product deleted successfull",
         status: 204,
-      //   deleteProduct,
+        //   deleteProduct,
       });
     }
   } catch (err) {

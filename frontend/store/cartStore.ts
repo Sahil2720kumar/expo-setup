@@ -23,6 +23,7 @@ const useCartStore = create<CartState>((set) => ({
       if (hasProduct) {
         // Increase quantity if the product already exists
         return {
+          
           products: state.products.map((p) => {
             if (p.id === hasProduct.id) {
               return { ...p, quantity: p.quantity + 1 };

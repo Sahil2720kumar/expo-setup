@@ -1,4 +1,5 @@
 import express, { json, urlencoded } from "express";
+import cors from "cors"
 import productsRoutes from "./routes/products/index.js";
 import authRoutes from "./routes/auth/index.js";
 import ordersRoutes from "./routes/orders/index.js";
@@ -9,6 +10,7 @@ const app = express();
 const port = 3000;
 
 // Middleware to parse incoming JSON requests
+app.use(cors())
 app.use(json());
 app.use(urlencoded({ extended: false }));
 

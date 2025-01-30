@@ -10,7 +10,7 @@ import { Bag } from '~/components/Icons';
 
 import { Button, ButtonText } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
-import useCartStore from '~/store/store';
+import useCartStore from '~/store/cartStore';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CheckoutScreen() {

@@ -10,12 +10,12 @@ import CustomDrawerContent from '~/components/CustomDrawerContent';
 import { Icon } from '~/components/ui/icon';
 import React from 'react';
 import { Badge, BadgeText } from '~/components/ui/badge';
-import { Button, ButtonIcon, ButtonText } from '~/components/ui/button';
+import { Button} from '~/components/ui/button';
 import { VStack } from '~/components/ui/vstack';
-import useCartStore from '~/store/store';
+import useCartStore from '~/store/cartStore';
 
 const DrawerLayout = () => {
-  const {items}=useCartStore()
+  const { items } = useCartStore();
   return (
     <Drawer
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -24,11 +24,6 @@ const DrawerLayout = () => {
         headerTitleAlign: 'center',
         drawerActiveBackgroundColor: '#F1F1F1',
         drawerActiveTintColor: '#000000',
-        // drawerIcon:({focused})=>{
-        //   return(
-
-        //   )
-        // },
         drawerItemStyle: {
           borderRadius: 10,
         },
@@ -47,13 +42,17 @@ const DrawerLayout = () => {
               <HeaderButton iconName="search" />
             </Link>
             <Link href="/cart" asChild>
-              <VStack className="relative mr-4" >
+              <VStack className="relative mr-4">
                 <Badge
                   className="absolute z-10 -mb-3.5 -mr-3.5 h-[22px] w-[22px] self-end rounded-full bg-red-600"
                   variant="solid">
                   <BadgeText className="text-white">{items}</BadgeText>
                 </Badge>
-                <Button onPress={()=>router.push("/cart")} size="lg" action="secondary" className="rounded-full bg-white p-0 px-2">
+                <Button
+                  onPress={() => router.push('/cart')}
+                  variant="solid"
+                  action="secondary"
+                  className="rounded-full bg-white p-0 px-2">
                   <ShoppingCart color={'black'} size={24} />
                 </Button>
               </VStack>

@@ -5,7 +5,7 @@ import { Image } from './ui/image';
 import { Text } from './ui/text';
 import { Minus, Plus } from 'lucide-react-native';
 import { Product } from '~/types';
-import useCartStore from '~/store/store';
+import useCartStore from '~/store/cartStore';
 
 type CartItemProps = {
   item: Product & { quantity: number };

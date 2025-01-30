@@ -12,7 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { type InferSelectModel  } from "drizzle-orm";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
-
+ 
 export const productsTable = pgTable("products", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   category: varchar({ length: 255 }).notNull(),

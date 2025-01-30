@@ -1,7 +1,9 @@
-import { Link, useRouter } from 'expo-router';
+import { useMutation } from '@tanstack/react-query';
+import { Link, Redirect, useRouter } from 'expo-router';
 import { AlertCircleIcon, EyeIcon, EyeOffIcon } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { View, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Dimensions, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { signInUser } from '~/api/auth';
 
 import { Button, ButtonText } from '~/components/ui/button';
 import {
@@ -14,17 +16,20 @@ import { Icon } from '~/components/ui/icon';
 import { Input, InputField, InputIcon, InputSlot } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
+import useAuthStore from '~/store/authStore';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import { userSignInSchema } from '~/vaildators/userSchema';
 
 const SignIn = () => {
-  const {marginAuto,minWidth}=useCommonBreakPoints()
+  const { marginAuto, minWidth } = useCommonBreakPoints();
+  const { setSessionUser, setSessionToken, sessionToken } = useAuthStore();
   const { width, height: screenHeight } = Dimensions.get('window');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [errors, setErrors] = useState({});
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [isInvalid, setIsInvalid] = React.useState(false);
@@ -34,7 +39,19 @@ const SignIn = () => {
     setShowPassword((prev) => !prev);
   };
 
- 
+  const { mutate,isPending } = useMutation({
+    mutationFn: (data: { email: string; password: string }) => signInUser(data),
+    onSuccess(data) {
+      setSessionUser(data.user);
+      setSessionToken(data.token);
+      router.push('/(drawer)');
+    },
+    onError(error) {
+      console.log('Login Failed', error.message);
+      setLoginError(error.message)
+      setIsInvalid(true)
+    },
+  });
 
   const handleInputChange = (field, value) => {
     setFormData((prevState) => ({
@@ -44,11 +61,10 @@ const SignIn = () => {
   };
 
   const handleSubmit = async () => {
-    console.log('onSubmit...');
     try {
-      const user = await userSignInSchema.validate(formData, { abortEarly: false }); // Collect all errors
-      setErrors({})
-      console.log(user);
+      // const user = await userSignInSchema.validate(formData, { abortEarly: false }); // Collect all errors
+      setErrors({});
+      mutate(formData);
     } catch (error) {
       if (error.name === 'ValidationError') {
         const fieldErrors = {};
@@ -63,6 +79,10 @@ const SignIn = () => {
       }
     }
   };
+
+  if (sessionToken) {
+    return <Redirect href={'/(drawer)'} />;
+  }
 
   return (
     <KeyboardAvoidingView
@@ -121,9 +141,8 @@ const SignIn = () => {
                 />
               </Input>
               <HStack
-                className={`mt-1 ${errors.email ? 'flex' : 'hidden'} flex-row items-center gap-1`}
-                >
-                <Icon color="#DC3545" as={AlertCircleIcon} className='' />
+                className={`mt-1 ${errors.email ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
+                <Icon color="#DC3545" as={AlertCircleIcon} className="" />
                 <Text className="text-[#DC3545]"> {errors.email ?? errors.email}</Text>
               </HStack>
             </View>
@@ -145,15 +164,24 @@ const SignIn = () => {
                   <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
                 </InputSlot>
               </Input>
-              <FormControlHelper className={`${errors.password ? 'hidden' : 'block'}`}>
+              <FormControlHelper
+                className={`${errors.password || loginError ? 'hidden' : 'block'}`}>
                 <FormControlHelperText className="text-[#888888]">
                   Must be atleast 6 characters.
                 </FormControlHelperText>
               </FormControlHelper>
               <View
-                className={`mt-1 ${errors.password ? 'flex' : 'hidden'} flex-row items-center gap-1`} style={{flexDirection:"row"}}>
+                className={`mt-1 ${errors.password ? 'flex' : 'hidden'} flex-row items-center gap-1`}
+                style={{ flexDirection: 'row' }}>
                 <Icon color="#DC3545" as={AlertCircleIcon} />
-                <Text className="text-[#DC3545] w-[80%]"> {errors.password ?? errors.password}</Text>
+                <Text className="w-[80%] text-[#DC3545]">{errors.password ?? errors.password}</Text>
+              </View>
+
+              <View
+                className={`mt-1 ${loginError ? 'flex' : 'hidden'} flex-row items-center gap-1`}
+                style={{ flexDirection: 'row' }}>
+                <Icon color="#DC3545" as={AlertCircleIcon} />
+                <Text className="w-[80%] text-[#DC3545] ">{loginError ?? loginError}</Text>
               </View>
             </View>
 
@@ -173,9 +201,18 @@ const SignIn = () => {
             className="rounded-[28] bg-[#F93C00]"
             onPress={handleSubmit}
             style={{ borderRadius: 28, height: 48 }}>
-            <ButtonText className="uppercase" size="lg">
-              sign In
-            </ButtonText>
+            {isPending ? (
+              <View className="flex-row gap-3">
+                <ActivityIndicator color={'white'} />
+                <ButtonText size="lg" className="uppercase ">
+                  Loading...
+                </ButtonText>
+              </View>
+            ) : (
+              <ButtonText size="lg" className="uppercase ">
+                SIGN IN
+              </ButtonText>
+            )}
           </Button>
         </View>
         {/* <View>
