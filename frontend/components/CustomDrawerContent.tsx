@@ -4,16 +4,37 @@ import { FlatList, Pressable, View } from 'react-native';
 import { Image } from './ui/image';
 import { Divider } from './ui/divider';
 import { VStack } from './ui/vstack';
-import { Home, HomeIcon, LogOut, MapPin, PhoneIcon, ShoppingCart, StarIcon, User } from 'lucide-react-native';
+import {
+  Home,
+  HomeIcon,
+  LogOut,
+  MapPin,
+  PhoneIcon,
+  ShoppingCart,
+  StarIcon,
+  User,
+} from 'lucide-react-native';
 import { Icon } from './ui/icon';
 import { ScrollView } from 'react-native-virtualized-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, ButtonIcon, ButtonText } from './ui/button';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
+import useAuthStore from '~/store/authStore';
 
 export default function CustomDrawerContent(props: any) {
   // console.log(props.navigation);
   const { top, bottom } = useSafeAreaInsets();
+  const { sessionToken, sessionUser, clearSession } = useAuthStore();
+
+  const handleAuth = (task: 'login' | 'logout') => {
+    if (task === 'login') {
+      router.push('/(drawer)/(auth)/signIn');
+      return;
+    }
+    if (task === 'logout' || (sessionToken && sessionUser)) {
+      clearSession();
+    }
+  };
 
   return (
     <View className="flex-1 p-6">
@@ -49,12 +70,18 @@ export default function CustomDrawerContent(props: any) {
               </Link>
             )}
           /> */}
-          <DrawerItemList {...props}/>
+          <DrawerItemList {...props} />
         </View>
       </ScrollView>
       <View style={{ paddingBottom: 10 + bottom }}>
-        <Button className="w-full gap-2" variant="outline" action="secondary">
-          <ButtonText>Logout</ButtonText>
+        <Button
+          onPress={() => {
+            sessionToken && sessionUser ? handleAuth('logout') : handleAuth('login');
+          }}
+          className="w-full gap-2"
+          variant="outline"
+          action="secondary">
+          <ButtonText>{sessionToken && sessionUser ? 'Logout' : 'Login'}</ButtonText>
           {/* LogOut is imported from 'lucide-react-native' */}
           <ButtonIcon as={LogOut} />
         </Button>

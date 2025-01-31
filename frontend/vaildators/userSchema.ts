@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 export const userSignInSchema = yup.object({
-  email: yup.string().email('Invalid email format').required('Email is required').trim(),
+  email: yup.string().email('Invalid email format').required('Email is required').trim().lowercase(),
   password: yup
     .string()
     .min(8, 'Password must be at least 8 characters long')
@@ -23,7 +23,7 @@ export const userSignUpSchema = yup.object({
     .string()
     .min(2, 'last name must be at least 2 characters long')
     .max(100, 'last name cannot exceed 100 characters'),
-  email: yup.string().email('Invalid email format').required('Email is required').trim(),
+  email: yup.string().email('Invalid email format').required('Email is required').trim().lowercase(),
   password: yup
     .string()
     .min(8, 'Password must be at least 8 characters long')

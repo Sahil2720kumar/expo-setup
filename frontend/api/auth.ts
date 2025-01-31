@@ -29,7 +29,7 @@ export const signInUser = async ({ email, password }: { email: string; password:
     // console.error('Fetch failed:', error);
     throw error;
   }
-};
+}; 
 
 export const signUpUser = async ({
   firstName,

@@ -2,7 +2,14 @@ import { useMutation } from '@tanstack/react-query';
 import { Link, Redirect, useRouter } from 'expo-router';
 import { AlertCircleIcon, EyeIcon, EyeOffIcon } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { View, Dimensions, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import { signInUser } from '~/api/auth';
 
 import { Button, ButtonText } from '~/components/ui/button';
@@ -39,17 +46,19 @@ const SignIn = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const { mutate,isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (data: { email: string; password: string }) => signInUser(data),
     onSuccess(data) {
-      setSessionUser(data.user);
-      setSessionToken(data.token);
-      router.push('/(drawer)');
+      if (data.user && data.token) {
+        setSessionUser(data.user);
+        setSessionToken(data.token);
+        router.push('/(drawer)');
+      }
     },
     onError(error) {
       console.log('Login Failed', error.message);
-      setLoginError(error.message)
-      setIsInvalid(true)
+      setLoginError(error.message);
+      setIsInvalid(true);
     },
   });
 
@@ -63,8 +72,10 @@ const SignIn = () => {
   const handleSubmit = async () => {
     try {
       // const user = await userSignInSchema.validate(formData, { abortEarly: false }); // Collect all errors
+      // console.log(user);
       setErrors({});
       mutate(formData);
+
     } catch (error) {
       if (error.name === 'ValidationError') {
         const fieldErrors = {};
