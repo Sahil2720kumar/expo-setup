@@ -5,10 +5,11 @@ import {
   integer,
   pgTable,
   serial,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { usersTable } from "./usersSchema.js";
-import { productsTable } from "./productsSchema.js";
+import { addressesTable, usersTable } from "./usersSchema";
+import { productsTable } from "./productsSchema";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
@@ -16,12 +17,17 @@ import { type InferSelectModel } from "drizzle-orm";
 
 export const ordersTable = pgTable("orders", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  customerId: integer("customer_id")
+  customerId: uuid("customer_id")
     .notNull()
     .references(() => usersTable.id, {
       onDelete: "cascade",
     }),
   orderDate: date("order_date").defaultNow().notNull(),
+  addressId: integer("address_id")
+    .notNull()
+    .references(() => addressesTable.id, {
+      onDelete: "cascade",
+    }),
   paymentMethod: varchar("payment_method", { length: 100 })
     .default("Cash on Delivery")
     .notNull(),
@@ -40,6 +46,7 @@ export const orderItemsTable = pgTable("order_items", {
     .references(() => productsTable.id, {
       onDelete: "cascade",
     }),
+
   quantity: integer("quantity").default(1).notNull(),
   status: varchar("status", { length: 50 }).default("pending").notNull(),
   price: doublePrecision().notNull(),

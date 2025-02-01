@@ -8,6 +8,7 @@ import {
   timestamp,
   json,
   integer,
+  uuid,
 } from "drizzle-orm/pg-core";
 import {
   createInsertSchema,
@@ -17,7 +18,7 @@ import {
 
 // Drizzle ORM schema
 export const usersTable = pgTable("users", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(), // Full name of the user
   email: varchar("email", { length: 255 }).notNull(), // Email address
   password: varchar("password", { length: 255 }).notNull(), // Hashed password
@@ -54,7 +55,7 @@ export const loginUserSchema = createSelectSchema(usersTable).pick({
 //address schema
 export const addressesTable = pgTable("addresses", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  userId: integer("user_id")
+  userId: uuid("user_id")
     .references(() => usersTable.id, {
       onDelete: "cascade",
     })

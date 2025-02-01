@@ -5,64 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1737715698215,
-      "tag": "0000_fair_runaways",
+      "when": 1738436052586,
+      "tag": "0000_free_banshee",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1737791715662,
-      "tag": "0001_tiny_master_chief",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1737791976785,
-      "tag": "0002_magical_the_captain",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1737800429307,
-      "tag": "0003_early_wind_dancer",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1737813009372,
-      "tag": "0004_busy_nomad",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1737813662831,
-      "tag": "0005_mushy_hannibal_king",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1737815231323,
-      "tag": "0006_nifty_microbe",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1737815946883,
-      "tag": "0007_warm_captain_cross",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1737832760154,
-      "tag": "0008_lucky_grim_reaper",
+      "when": 1738436571292,
+      "tag": "0001_perpetual_kinsey_walden",
       "breakpoints": true
     }
   ]

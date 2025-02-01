@@ -11,7 +11,7 @@ export const listOfAddresses = async (req: Request, res: Response) => {
     const addressesList = await db
       .select()
       .from(addressesTable)
-      .where(eq(addressesTable.userId, Number(req.userId)))
+      .where(eq(addressesTable.userId, req.userId!))
       .orderBy(asc(addressesTable.id));
 
     res.status(200).json(addressesList);
@@ -46,10 +46,12 @@ export const insertAddress = async (req: Request, res: Response) => {
   try {
     const [newInsertedAddress] = await db
       .insert(addressesTable)
-      .values({ ...req.cleanBody, userId: Number(req.userId) })
+      .values({ ...req.cleanBody, userId: req.userId})
       .returning();
     res.status(200).json(newInsertedAddress);
   } catch (err) {
+    console.log(err);
+    
     res
       .status(500)
       .json({ message: "Failed to insert the address", status: 500 });
@@ -133,7 +135,7 @@ export const getUserById = async (req: Request, res: Response) => {
       with: {
         addresses: true,
       },
-      where: (users, { eq }) => eq(users.id, Number(userId)),
+      where: (users, { eq }) => eq(users.id, userId),
     });
 
     if (!user) {
@@ -164,11 +166,11 @@ export const updateUser = async (req: Request, res: Response) => {
       updatedFields = { ...updatedFields, password: hashedPassword };
     }
 
-    if (Number(req.userId === Number(userId) || req.role === "admin")) {
+    if (Number(req.userId === userId || req.role === "admin")) {
       const [user] = await db
         .update(usersTable)
         .set(updatedFields)
-        .where(eq(usersTable.id, Number(userId)))
+        .where(eq(usersTable.id,userId))
         .returning();
 
       if (!user) {

@@ -14,7 +14,7 @@ export const insertOrder = async (req: Request, res: Response) => {
   try {
     // console.log(req.cleanBody);
     const data = {
-      order: { ...req.cleanBody.order, customerId: Number(req.userId) },
+      order: { ...req.cleanBody.order, customerId: req.userId},
       items: req.cleanBody.items,
     };
 
@@ -74,7 +74,7 @@ export const listOfOrders = async (req: Request, res: Response) => {
     const orders = await db
       .select()
       .from(ordersTable)
-      .where(eq(ordersTable.customerId, Number(req.userId)));
+      .where(eq(ordersTable.customerId, req.userId!));
     res.status(200).json(orders);
     
   } catch (err) {
