@@ -74,6 +74,7 @@ const SignIn = () => {
       // const user = await userSignInSchema.validate(formData, { abortEarly: false }); // Collect all errors
       // console.log(user);
       setErrors({});
+      setLoginError(null)
       mutate(formData);
 
     } catch (error) {

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../../db/index.js";
 import { addressesTable, usersTable } from "../../db/usersSchema.js";
-import { eq, getTableColumns } from "drizzle-orm";
+import { asc, eq, getTableColumns } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export const listOfAddresses = async (req: Request, res: Response) => {
@@ -11,7 +11,8 @@ export const listOfAddresses = async (req: Request, res: Response) => {
     const addressesList = await db
       .select()
       .from(addressesTable)
-      .where(eq(addressesTable.userId, Number(req.userId)));
+      .where(eq(addressesTable.userId, Number(req.userId)))
+      .orderBy(asc(addressesTable.id));
 
     res.status(200).json(addressesList);
   } catch (err) {
@@ -117,6 +118,13 @@ export const getUserById = async (req: Request, res: Response) => {
     //   .select({ ...rest })
     //   .from(usersTable)
     //   .where(eq(usersTable.id, Number(userId)));
+
+    //required
+    // if(Number(userId)!==req.userId){
+    //   res.status(401).json({ message: "Something went wrong", status: 401 });
+    //   console.log(userId,req.userId);
+    //   return;
+    // }
 
     const [user] = await db.query.usersTable.findMany({
       columns: {

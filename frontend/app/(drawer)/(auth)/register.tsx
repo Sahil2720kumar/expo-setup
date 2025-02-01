@@ -72,6 +72,7 @@ const SignUpScreen = () => {
       const user = await userSignUpSchema.validate(formData, { abortEarly: false }); // Collect all errors
       console.log(user);
       setErrors({});
+      setLoginError(null)
       mutate(user);
     } catch (error) {
       if (error.name === 'ValidationError') {

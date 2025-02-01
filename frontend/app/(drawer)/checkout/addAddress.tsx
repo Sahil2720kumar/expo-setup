@@ -1,7 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { AlertCircleIcon, Plus } from 'lucide-react-native';
-import { useState } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  View,
+} from 'react-native';
 // import { ScrollView } from 'react-native-virtualized-view';
 import { Button, ButtonIcon, ButtonText } from '~/components/ui/button';
 import { FormControl } from '~/components/ui/form-control';
@@ -12,21 +19,36 @@ import { Text } from '~/components/ui/text';
 import addressSchema from '~/vaildators/addressSchema';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import useAuthStore from '~/store/authStore';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getAddressById, insertAddress, updateAddress } from '~/api/addresses';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Address } from '~/types/user';
 
 export default function AddAddressScreen() {
+  const { id: addressId } = useLocalSearchParams();
+  // console.log('id is', addressId);
+  useEffect(() => {
+    setFormData({
+      street: '',
+      state: '',
+      city: '',
+      zipCode: '',
+    });
+  }, [addressId]);
+
+  const client = useQueryClient();
+
   const { marginAuto, minWidth } = useCommonBreakPoints();
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    address: '',
+    street: '',
     city: '',
     state: '',
     zipCode: '',
-    phoneNumber: '',
   });
   const [errors, setErrors] = useState({});
+  const [mutateError, setMutateError] = useState<string | null>(null);
   const [isInvalid, setIsInvalid] = useState(false);
   const handleInputChange = (field, value) => {
     setFormData((prevState) => ({
@@ -35,16 +57,76 @@ export default function AddAddressScreen() {
     }));
   };
 
-  const cartItems = [1, 2, 3, 4, 5, 6];
+  const { sessionUser, sessionToken } = useAuthStore();
 
+  // Submit address
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: { state: string; city: string; street: string; zip: string }) =>
+      addressId
+        ? updateAddress(data, Number(sessionUser?.id), Number(addressId), sessionToken!)
+        : insertAddress(data, Number(sessionUser?.id), sessionToken!),
+    onSuccess(data) {
+      client.invalidateQueries({ queryKey: ['shippingAddresses', sessionUser?.id] });
+      client.invalidateQueries({ queryKey: ['shippingAddress', addressId] });
+      router.push('/(drawer)/shippingAddress');
+    },
+    onError(error) {
+      // console.log('insert Failed', error);
+      setIsInvalid(true);
+      setMutateError(error.message);
+    },
+  });
 
+  //Get address By Id
+  const {
+    data: address,
+    isLoading,
+    error,
+    isSuccess,
+  } = useQuery<Address>({
+    queryKey: ['shippingAddress', addressId],
+    queryFn: () => getAddressById(Number(sessionUser?.id), Number(addressId), sessionToken!),
+    enabled: !!addressId,
+  });
+
+  useEffect(() => {
+    if (address) {
+      setFormData({
+        street: address.street || '',
+        state: address.state || '',
+        city: address.city || '',
+        zipCode: address.zip || '',
+      });
+    }
+  }, [address]);
+  
+
+  if (addressId && isLoading) {
+    return (
+      <View
+        style={{
+          height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator size={'large'} />
+      </View>
+    );
+  }
 
   const handleSubmit = async () => {
     console.log('onSubmit...');
     try {
-      const user = await addressSchema.validate(formData, { abortEarly: false }); // Collect all errors
-      console.log(user);
+      const address = await addressSchema.validate(formData, { abortEarly: false }); // Collect all errors
+      console.log(address);
       setErrors({});
+      setMutateError(null);
+      mutate({
+        state: address.state,
+        city: address.city,
+        street: address.street,
+        zip: address.zipCode,
+      });
     } catch (error) {
       if (error.name === 'ValidationError') {
         const fieldErrors = {};
@@ -104,48 +186,6 @@ export default function AddAddressScreen() {
                 isRequired={true}
                 className="gap-6">
                 <View>
-                  <View className="flex-row gap-[9] ">
-                    <Input
-                      variant="underlined"
-                      size="md"
-                      isDisabled={false}
-                      isInvalid={false}
-                      isReadOnly={false}
-                      className="min-w-[50%] ">
-                      <InputField
-                        placeholder="First name"
-                        onChangeText={(firstName) => handleInputChange('firstName', firstName)}
-                        value={formData.firstName}
-                        placeholderClassName="text-[#000000]"
-                      />
-                    </Input>
-                    <Input
-                      variant="underlined"
-                      size="md"
-                      isDisabled={false}
-                      isInvalid={false}
-                      isReadOnly={false}
-                      className="min-w-[50%]">
-                      <InputField
-                        placeholder="Last name"
-                        onChangeText={(lastName) => handleInputChange('lastName', lastName)}
-                        value={formData.lastName}
-                        placeholderClassName="text-[#000000]"
-                      />
-                    </Input>
-                  </View>
-                  <HStack
-                    className={`mt-1 ${errors.firstName ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
-                    <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]"> {errors.firstName ?? errors.firstName}</Text>
-                  </HStack>
-                  <HStack
-                    className={`mt-1 ${errors.lastName ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
-                    <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]"> {errors.lastName ?? errors.lastName}</Text>
-                  </HStack>
-                </View>
-                <View>
                   <Input
                     variant="underlined"
                     size="md"
@@ -154,16 +194,16 @@ export default function AddAddressScreen() {
                     isReadOnly={false}
                     className="min-w-[250px]">
                     <InputField
-                      placeholder="Address"
-                      onChangeText={(address) => handleInputChange('address', address)}
-                      value={formData.address}
+                      placeholder="Street"
+                      onChangeText={(street) => handleInputChange('street', street)}
+                      value={formData.street || ''}
                       placeholderClassName="text-[#000000]"
                     />
                   </Input>
                   <HStack
-                    className={`mt-1 ${errors.address ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
+                    className={`mt-1 ${errors.street ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
                     <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]"> {errors.address ?? errors.address}</Text>
+                    <Text className="text-[#DC3545]"> {errors.street ?? errors.street}</Text>
                   </HStack>
                 </View>
                 <View>
@@ -177,7 +217,7 @@ export default function AddAddressScreen() {
                     <InputField
                       placeholder="City"
                       onChangeText={(city) => handleInputChange('city', city)}
-                      value={formData.city}
+                      value={formData.city || ''}
                       placeholderClassName="text-[#000000]"
                     />
                   </Input>
@@ -199,7 +239,7 @@ export default function AddAddressScreen() {
                       <InputField
                         placeholder="State"
                         onChangeText={(state) => handleInputChange('state', state)}
-                        value={formData.state}
+                        value={formData.state || ''}
                         placeholderClassName="text-[#000000]"
                       />
                     </Input>
@@ -213,7 +253,7 @@ export default function AddAddressScreen() {
                       <InputField
                         placeholder="Zip code"
                         onChangeText={(zipCode) => handleInputChange('zipCode', zipCode)}
-                        value={formData.zipCode}
+                        value={formData.zipCode || ''}
                         placeholderClassName="text-[#000000]"
                       />
                     </Input>
@@ -228,29 +268,11 @@ export default function AddAddressScreen() {
                     <Icon color="#DC3545" as={AlertCircleIcon} className="" />
                     <Text className="text-[#DC3545]"> {errors.zipCode ?? errors.zipCode}</Text>
                   </HStack>
-                </View>
-                <View>
-                  <Input
-                    variant="underlined"
-                    size="md"
-                    isDisabled={false}
-                    isInvalid={false}
-                    isReadOnly={false}
-                    className="min-w-[250px]">
-                    <InputField
-                      placeholder="Phone number"
-                      onChangeText={(phoneNumber) => handleInputChange('phoneNumber', phoneNumber)}
-                      value={formData.phoneNumber}
-                      placeholderClassName="text-[#000000]"
-                    />
-                  </Input>
                   <HStack
-                    className={`mt-1 ${errors.phoneNumber ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
-                    <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]">
-                      {' '}
-                      {errors.phoneNumber ?? errors.phoneNumber}
-                    </Text>
+                    className={`mt-1 ${mutateError ? 'flex' : 'hidden'} flex-row items-center gap-1`}
+                    style={{ flexDirection: 'row' }}>
+                    <Icon color="#DC3545" as={AlertCircleIcon} />
+                    <Text className="w-[80%] text-[#DC3545] ">{mutateError ?? mutateError}</Text>
                   </HStack>
                 </View>
               </FormControl>
@@ -270,10 +292,22 @@ export default function AddAddressScreen() {
               className="rounded-[28] bg-[#F93C00]"
               style={{ borderRadius: 28, height: 48 }}
               onPress={handleSubmit}>
-              <ButtonIcon as={Plus} className="text-white" />
-              <ButtonText className="uppercase" size="lg">
-                Add now
-              </ButtonText>
+              {isPending ? (
+                <View className="flex-row gap-3">
+                  <ActivityIndicator color={'white'} />
+                  <ButtonText size="lg" className="uppercase ">
+                    Loading...
+                  </ButtonText>
+                </View>
+              ) : (
+                <>
+                  <ButtonIcon as={Plus} className="text-white" />
+
+                  <ButtonText size="lg" className="uppercase ">
+                    {addressId ? 'UPDATE NOW' : 'ADD NOW'}
+                  </ButtonText>
+                </>
+              )}
             </Button>
           </View>
         </View>

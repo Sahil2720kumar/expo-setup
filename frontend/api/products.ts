@@ -15,7 +15,7 @@ export const getAllProducts = async (page = 1, pageSize = 6) => {
     return data;
   } catch (error) {
     console.error('Fetch failed:', error);
-    return null;
+    throw error;
   }
 };
 
@@ -33,6 +33,6 @@ export const getProductById = async (productId: number) => {
     return data;
   } catch (error) {
     console.error('Fetch failed:', error);
-    return null;
+    throw error;
   }
 };
