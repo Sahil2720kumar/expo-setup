@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { Link, useRouter } from 'expo-router';
+import { Link, Redirect, useRouter } from 'expo-router';
 import { AlertCircleIcon, EyeIcon, EyeOffIcon } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -26,7 +26,7 @@ import { userSignUpSchema } from '~/vaildators/userSchema';
 const SignUpScreen = () => {
   const { width, height: screenHeight } = Dimensions.get('window');
   const { marginAuto, minWidth } = useCommonBreakPoints();
-  const { setSessionUser, setSessionToken, sessionToken } = useAuthStore();
+  const { setSessionUser, setSessionToken, sessionToken ,sessionUser} = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -87,6 +87,10 @@ const SignUpScreen = () => {
       }
     }
   };
+
+  if (sessionToken && sessionUser) {
+    return <Redirect href={'/(drawer)'} />;
+  }
 
   return (
     <KeyboardAvoidingView

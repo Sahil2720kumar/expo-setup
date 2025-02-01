@@ -18,7 +18,7 @@ export const signInUser = async ({ email, password }: { email: string; password:
     }
 
     const data = await res.json();
-    console.log('Fetched data:', data);
+    // console.log('Fetched data:', data);
 
     if (!data || !data.user || !data.token) {
       throw new Error('Invalid response from server');
@@ -59,7 +59,7 @@ export const signUpUser = async ({
     }
 
     const data = await res.json();
-    console.log('Fetched data:', data);
+    // console.log('Fetched data:', data);
 
     return data;
   } catch (error) {

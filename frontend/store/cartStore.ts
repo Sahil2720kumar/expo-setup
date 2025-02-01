@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { Product } from "~/types";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export interface CartState {
   products: Array<Product & { quantity: number }>;
@@ -7,69 +9,77 @@ export interface CartState {
   reduceProduct: (product: Product) => void;
   clearCart: () => void;
   items: number;
-  totalPrice:number;
+  totalPrice: number;
 }
 
-const useCartStore = create<CartState>((set) => ({
-  products: [],
-  items: 0,
-  totalPrice:0,
+const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      products: [],
+      items: 0,
+      totalPrice: 0,
 
-  addProduct: (product: Product) =>
-    set((state) => {
-      state.items++;
-      state.totalPrice=state.totalPrice+product.price
-      const hasProduct = state.products.find((p) => p.id === product.id);
-      if (hasProduct) {
-        // Increase quantity if the product already exists
-        return {
-          
-          products: state.products.map((p) => {
-            if (p.id === hasProduct.id) {
-              return { ...p, quantity: p.quantity + 1 };
-            }
-            return p;
-          }),
-        };
-      } else {
-        // Add new product to the cart
-        return {
-          products: [...state.products, { ...product, quantity: 1 }],
-        };
-      }
-    }),
+      addProduct: (product: Product) => {
+        const { products, items, totalPrice } = get();
+        const existingProduct = products.find((p) => p.id === product.id);
 
-  reduceProduct: (product: Product) =>
-    set((state) => {
-      state.items--;
-      state.totalPrice =state.totalPrice- product.price;
-      const hasProduct = state.products.find((p) => p.id === product.id);
-      if (hasProduct && hasProduct?.quantity > 1) {
-        // Decrease quantity if it's greater than 1
-        return {
-          products: state.products.map((p) => {
-            if (p.id === hasProduct.id) {
-              return { ...p, quantity: p.quantity - 1 };
-            }
-            return p;
-          }),
-        };
-      } else {
-        // Remove product from the cart if quantity reaches 0
-        return {
-          products: state.products.filter((p) => p.id !== product.id),
-          items: state.items - 1,
-        };
-      }
-    }),
-  clearCart: () =>
-    set((state) => {
-      return {
-        items: 0,
-        totalPrice:0,
-        products: [],
-      };
-    }),
-}));
+        if (existingProduct) {
+          set({
+            products: products.map((p) =>
+              p.id === product.id
+                ? { ...p, quantity: p.quantity + 1 }
+                : p
+            ),
+            items: items + 1,
+            totalPrice: totalPrice + product.price,
+          });
+        } else {
+          set({
+            products: [...products, { ...product, quantity: 1 }],
+            items: items + 1,
+            totalPrice: totalPrice + product.price,
+          });
+        }
+      },
 
-export default useCartStore
+      reduceProduct: (product: Product) => {
+        const { products, items, totalPrice } = get();
+        const existingProduct = products.find((p) => p.id === product.id);
+
+        if (existingProduct) {
+          if (existingProduct.quantity > 1) {
+            set({
+              products: products.map((p) =>
+                p.id === product.id
+                  ? { ...p, quantity: p.quantity - 1 }
+                  : p
+              ),
+              items: items - 1,
+              totalPrice: totalPrice - product.price,
+            });
+          } else {
+            set({
+              products: products.filter((p) => p.id !== product.id),
+              items: items - 1,
+              totalPrice: totalPrice - product.price,
+            });
+          }
+        }
+      },
+
+      clearCart: () => {
+        set({
+          products: [],
+          items: 0,
+          totalPrice: 0,
+        });
+      },
+    }),
+    {
+      name: 'cart-store',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+
+export default useCartStore;

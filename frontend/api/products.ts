@@ -11,7 +11,7 @@ export const getAllProducts = async (page = 1, pageSize = 6) => {
     }
 
     const data = await res.json();
-    console.log('Fetched data:', data);
+    // console.log('Fetched data:', data);
     return data;
   } catch (error) {
     console.error('Fetch failed:', error);
@@ -19,8 +19,7 @@ export const getAllProducts = async (page = 1, pageSize = 6) => {
   }
 };
 
-
-export const getProductById = async (productId:number) => {
+export const getProductById = async (productId: number) => {
   try {
     const res = await fetch(`${API_URL}/products/${productId}`);
 
@@ -30,7 +29,7 @@ export const getProductById = async (productId:number) => {
     }
 
     const data = await res.json();
-    console.log('Fetched data:', data);
+    // console.log('Fetched data:', data);
     return data;
   } catch (error) {
     console.error('Fetch failed:', error);

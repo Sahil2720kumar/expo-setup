@@ -15,6 +15,8 @@ export interface AuthState {
 
 const authStorage = {
   getItem: async (key: string) => {
+   // console.log("secure storeage");
+    
     return await SecureStore.getItemAsync(key);
   },
   setItem: async (key: string, value: string) => {

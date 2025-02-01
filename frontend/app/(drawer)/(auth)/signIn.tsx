@@ -29,7 +29,7 @@ import { userSignInSchema } from '~/vaildators/userSchema';
 
 const SignIn = () => {
   const { marginAuto, minWidth } = useCommonBreakPoints();
-  const { setSessionUser, setSessionToken, sessionToken } = useAuthStore();
+  const { setSessionUser, setSessionToken, sessionToken,sessionUser } = useAuthStore();
   const { width, height: screenHeight } = Dimensions.get('window');
   const [formData, setFormData] = useState({
     email: '',
@@ -91,7 +91,7 @@ const SignIn = () => {
     }
   };
 
-  if (sessionToken) {
+  if (sessionToken && sessionUser ) {
     return <Redirect href={'/(drawer)'} />;
   }
 

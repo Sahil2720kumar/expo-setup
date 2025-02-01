@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Link, router } from 'expo-router';
+import { Link, router, useSegments } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import { HomeIcon, MapPin, PhoneIcon, Settings, Shirt, ShoppingCart } from 'lucide-react-native';
 
@@ -8,14 +8,28 @@ import { HeaderButton } from '../../components/HeaderButton';
 
 import CustomDrawerContent from '~/components/CustomDrawerContent';
 import { Icon } from '~/components/ui/icon';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Badge, BadgeText } from '~/components/ui/badge';
-import { Button} from '~/components/ui/button';
+import { Button } from '~/components/ui/button';
 import { VStack } from '~/components/ui/vstack';
 import useCartStore from '~/store/cartStore';
+import useAuthStore from '~/store/authStore';
 
 const DrawerLayout = () => {
+  const { sessionToken, sessionUser } = useAuthStore();
   const { items } = useCartStore();
+  const segments = useSegments();
+  //console.log('segments ', segments);
+  const protectedRoutes = ['checkout', 'orders', 'setting', 'shippingAddress'];
+  const isProtectedRoute = protectedRoutes.includes(segments[1]!);
+  // console.log(isProtectedRoute, segments[1]);
+
+  useEffect(() => {
+    if (!sessionUser && !sessionToken && isProtectedRoute) {
+      router.replace('/(drawer)/(auth)/signIn');
+    }
+  }, [sessionUser, sessionToken, isProtectedRoute, router]);
+
   return (
     <Drawer
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -74,6 +88,7 @@ const DrawerLayout = () => {
 
       <Drawer.Screen
         name="(auth)"
+        // redirect={true}
         options={{
           headerTitle: 'auth',
           drawerLabel: 'auth',

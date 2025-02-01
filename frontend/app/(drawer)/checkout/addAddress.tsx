@@ -1,35 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
-import {
-  AlertCircleIcon,
-  ChevronRight,
-  EyeIcon,
-  EyeOffIcon,
-  Minus,
-  Package,
-  Plus,
-} from 'lucide-react-native';
+import { AlertCircleIcon, Plus } from 'lucide-react-native';
 import { useState } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, TouchableOpacity, View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { Dimensions, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 // import { ScrollView } from 'react-native-virtualized-view';
-import { ScrollView } from 'react-native';
-import CartItem from '~/components/CartItem';
-import { Bag } from '~/components/Icons';
-
-import { ScreenContent } from '~/components/ScreenContent';
 import { Button, ButtonIcon, ButtonText } from '~/components/ui/button';
 import { FormControl } from '~/components/ui/form-control';
 import { HStack } from '~/components/ui/hstack';
 import { Icon } from '~/components/ui/icon';
-import { Image } from '~/components/ui/image';
-import { Input, InputField, InputSlot, InputIcon } from '~/components/ui/input';
+import { Input, InputField } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 import addressSchema from '~/vaildators/addressSchema';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
+import useAuthStore from '~/store/authStore';
 
 export default function AddAddressScreen() {
-  const {marginAuto,minWidth}=useCommonBreakPoints()
+  const { marginAuto, minWidth } = useCommonBreakPoints();
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   const [formData, setFormData] = useState({
@@ -42,11 +27,7 @@ export default function AddAddressScreen() {
     phoneNumber: '',
   });
   const [errors, setErrors] = useState({});
-
   const [isInvalid, setIsInvalid] = useState(false);
-
-
-
   const handleInputChange = (field, value) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -55,6 +36,8 @@ export default function AddAddressScreen() {
   };
 
   const cartItems = [1, 2, 3, 4, 5, 6];
+
+
 
   const handleSubmit = async () => {
     console.log('onSubmit...');
@@ -287,10 +270,9 @@ export default function AddAddressScreen() {
               className="rounded-[28] bg-[#F93C00]"
               style={{ borderRadius: 28, height: 48 }}
               onPress={handleSubmit}>
-               <ButtonIcon as={Plus} className="text-white" />
+              <ButtonIcon as={Plus} className="text-white" />
               <ButtonText className="uppercase" size="lg">
-               
-              Add now
+                Add now
               </ButtonText>
             </Button>
           </View>
