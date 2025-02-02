@@ -1,36 +1,90 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ChevronRight, Minus, Package, Plus } from 'lucide-react-native';
+import { ChevronRight, Package, Plus } from 'lucide-react-native';
 import { useState } from 'react';
-import { Dimensions, Platform, TouchableOpacity, View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { ActivityIndicator, Dimensions, Platform, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
-// import { ScrollView } from 'react-native';
-import CartItem from '~/components/CartItem';
+
+import { getAddresses } from '~/api/addresses';
+import { insertOrder } from '~/api/oders';
 import { Bag } from '~/components/Icons';
 import PaymentSuccess from '~/components/PaymentSuccess';
-
-import { ScreenContent } from '~/components/ScreenContent';
 import { Button, ButtonIcon, ButtonText } from '~/components/ui/button';
-import { Image } from '~/components/ui/image';
 import { Text } from '~/components/ui/text';
-import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
+import useAuthStore from '~/store/authStore';
+import useCartStore from '~/store/cartStore';
+import { Order, InsertOrderItem } from '~/types/order';
+import { Address } from '~/types/user';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CheckoutScreen() {
-  const router=useRouter()
-  const {marginAuto,minWidth}=useCommonBreakPoints()
+  const client = useQueryClient();
+  const router = useRouter();
+  const { marginAuto, minWidth } = useCommonBreakPoints();
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
+  const { sessionUser, sessionToken } = useAuthStore();
+  const { products, clearCart } = useCartStore();
+  const {
+    data: addresses = [],
+    isLoading,
+    error,
+  } = useQuery<Address[]>({
+    queryKey: ['shippingAddresses', sessionUser?.id],
+    queryFn: () => getAddresses(sessionUser?.id!, sessionToken!),
+  });
 
-  
+  const [selectedAddress, setSelectedAddress] = useState<number>(addresses?.[0]?.id || 1);
 
-  const cartItems = [1, 2, 3, 4, 5, 6];
-  // <ScrollView
-  //       contentContainerStyle={{ flexGrow: 1, backgroundColor: '#000000',maxWidth:600, marginHorizontal: marginAuto, }} // Ensures scrolling when content overflows
-  //       showsVerticalScrollIndicator={false} // Optional: Hides scroll indicator
-  //     ></ScrollView>
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: { order: Pick<Order, 'addressId'>; items: InsertOrderItem[] }) =>
+      insertOrder(data, sessionUser?.id!, sessionToken!),
+    onSuccess(data) {
+      console.log('inserted order', data);
+
+      clearCart();
+      client.invalidateQueries({ queryKey: ['orders', sessionUser?.id] });
+      // client.invalidateQueries({ queryKey: ['shippingAddress', addressId] });
+      router.push('/(drawer)/orders');
+    },
+    onError(error) {
+      console.log('insert Failed', error);
+      // setIsInvalid(true);
+      // setMutateError(error.message);
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  const onCheckOut = () => {
+    // setIsPaymentSuccessful(true);
+    console.log(products);
+    const insertedOrderData = {
+      addressId: selectedAddress,
+    };
+    const insertedOrderItemsData = products.map((product) => {
+      return {
+        productId: product?.id,
+        quantity: product.quantity,
+      };
+    });
+    console.log(insertedOrderData, insertedOrderItemsData);
+    mutate({ order: insertedOrderData, items: insertedOrderItemsData });
+  };
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -38,10 +92,8 @@ export default function CheckoutScreen() {
         backgroundColor: '#fff',
         paddingHorizontal: 15,
         paddingTop: 15,
-        overflowX: 'hidden',
-        // overflowY: 'scroll',
         maxWidth: 600,
-        minWidth: minWidth,
+        minWidth,
         marginHorizontal: marginAuto,
         position: 'relative',
       }} // Ensures scrolling when content overflows
@@ -54,9 +106,6 @@ export default function CheckoutScreen() {
         style={{
           paddingBottom: 3,
           backgroundColor: '',
-          //   flex:1,
-          //   justifyContent: 'flex-start',
-
           ...(Platform.OS === 'web' && {
             justifyContent: 'space-between', // Web-specific style
           }),
@@ -67,90 +116,91 @@ export default function CheckoutScreen() {
           </Text>
           <View className="gap-3 ">
             <Text className="font-semibold uppercase text-black">Shipping address</Text>
-            <View className="gap-0.5">
-              <View className="flex-row items-center justify-between">
-                <Text className="text-black">Iris Watson</Text>
-                <ChevronRight color={'black'} size={20} />
-              </View>
-              <Text className="w-[70%] text-[#888888]">
-                606-3727 Ullamcorper. Street Roseville NH 11523
-              </Text>
-            </View>
+            {addresses.map((address, index) => (
+              <TouchableOpacity
+                key={index}
+                activeOpacity={0.7}
+                style={{
+                  opacity: selectedAddress === address?.id ? 0.9 : 1,
+                  borderColor: 'black',
+                  // borderBottomWidth: selectedAddress === index ? 1 : 0,
+                  backgroundColor: selectedAddress === address?.id ? '#F0F4F8' : 'transparent', // Soft blue-gray
+                  padding: 10, // Adds spacing for a cleaner look
+                  borderRadius: 8, // Rounded corners for a modern feel
+                }}
+                onPress={() => setSelectedAddress(address?.id)}>
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-black">Address {index + 1}</Text>
+                  <ChevronRight size={20} />
+                </View>
+                <Text className="w-[70%] text-[#888888]">
+                  {address.street} {address.city} {address.state} {address.zip}
+                </Text>
+              </TouchableOpacity>
+            ))}
+            {!addresses.length && (
+              <Text className="text-lg font-bold">No shipping addresses available</Text>
+            )}
+
             <Button
               size="md"
               variant="solid"
               action="secondary"
-              onPress={()=>router.push("/(drawer)/checkout/addAddress")}
-              className="justify-between rounded-[28] bg-[#F1F1F1] hover:bg-[#F1F1F1]"
-              style={{ borderRadius: 28, height: 48 }}
-              isHovered={false}>
-              <ButtonText className="text-left font-medium text-black" size="md">
+              onPress={() => router.push('/(drawer)/checkout/addAddress')}
+              className="h-[48px] rounded-full bg-gray-200">
+              <ButtonText className="text-left font-medium text-black">
                 Add shipping address
               </ButtonText>
               <ButtonIcon as={Plus} className="text-black" />
             </Button>
           </View>
 
-          {/* Payment method */}
           <View className="gap-3">
             <Text className="font-semibold uppercase text-black">Payment method</Text>
             <Button
               size="md"
               variant="solid"
               action="secondary"
-              className="justify-between rounded-[28] bg-[#F1F1F1] hover:bg-[#F1F1F1]"
-              style={{ borderRadius: 28, height: 48 }}
-              isHovered={false}>
-              <ButtonText className="text-left font-medium text-black" size="md">
+              className="h-[48px] rounded-full bg-gray-200">
+              <ButtonText className="text-left font-medium text-black">
                 Online payment method
               </ButtonText>
             </Button>
           </View>
         </View>
-        <View
-          className="w-full"
-          style={{
-            paddingVertical: 10,
-            gap: 8,
-            justifyContent: 'flex-end',
-            backgroundColor: '',
-          }}>
+
+        <View id="view-2" className="gap-2 py-2">
           <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center justify-between gap-2">
-              <Package size={20} color={'black'} />
+            <View className="flex-row items-center gap-2">
+              <Package size={20} color="black" />
               <Text className="text-black">Delivery</Text>
             </View>
             <Text className="text-black">Free</Text>
           </View>
-          <View className="w-full flex-row justify-between">
-            <Text size="lg" className="font-bold uppercase text-black ">
-              Est. Total
-            </Text>
-            <Text size="lg" className="font-bold text-[#F93C00]">
-              $179
-            </Text>
+
+          <View className="flex-row justify-between">
+            <Text className="font-bold uppercase text-black">Est. Total</Text>
+            <Text className="font-bold text-[#F93C00]">$179</Text>
           </View>
 
           <Button
             size="md"
             variant="solid"
-            className="rounded-[28] bg-[#F93C00]"
-            style={{ borderRadius: 28, height: 48 }}
-            onPress={() => setIsPaymentSuccessful(true)}>
+            className="h-[48px] rounded-full bg-[#F93C00]"
+            onPress={onCheckOut}>
             <Bag />
-            <ButtonText className="uppercase" size="lg">
-              Checkout
-            </ButtonText>
+            <ButtonText className="uppercase">Checkout</ButtonText>
           </Button>
         </View>
       </View>
-      {isPaymentSuccessful ? (
+
+      {isPaymentSuccessful && (
         <PaymentSuccess
           screenHeight={screenHeight}
           isPaymentSuccessful={isPaymentSuccessful}
           setIsPaymentSuccessful={setIsPaymentSuccessful}
         />
-      ) : null}
+      )}
     </ScrollView>
   );
 }

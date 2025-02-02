@@ -66,13 +66,15 @@ const SignUpScreen = () => {
     }));
   };
 
+  
+
   const handleSubmit = async () => {
     console.log('onSubmit...');
     try {
       const user = await userSignUpSchema.validate(formData, { abortEarly: false }); // Collect all errors
       console.log(user);
       setErrors({});
-      setLoginError(null)
+      setSignUpError(null)
       mutate(user);
     } catch (error) {
       if (error.name === 'ValidationError') {

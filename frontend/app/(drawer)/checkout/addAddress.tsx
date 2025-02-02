@@ -63,8 +63,8 @@ export default function AddAddressScreen() {
   const { mutate, isPending } = useMutation({
     mutationFn: (data: { state: string; city: string; street: string; zip: string }) =>
       addressId
-        ? updateAddress(data, Number(sessionUser?.id), Number(addressId), sessionToken!)
-        : insertAddress(data, Number(sessionUser?.id), sessionToken!),
+        ? updateAddress(data, sessionUser?.id!, Number(addressId), sessionToken!)
+        : insertAddress(data,sessionUser?.id!, sessionToken!),
     onSuccess(data) {
       client.invalidateQueries({ queryKey: ['shippingAddresses', sessionUser?.id] });
       client.invalidateQueries({ queryKey: ['shippingAddress', addressId] });
@@ -85,7 +85,7 @@ export default function AddAddressScreen() {
     isSuccess,
   } = useQuery<Address>({
     queryKey: ['shippingAddress', addressId],
-    queryFn: () => getAddressById(Number(sessionUser?.id), Number(addressId), sessionToken!),
+    queryFn: () => getAddressById(sessionUser?.id!, Number(addressId), sessionToken!),
     enabled: !!addressId,
   });
 

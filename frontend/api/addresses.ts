@@ -2,8 +2,10 @@ import useAuthStore from '~/store/authStore';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export const getAddresses = async (userId: number, sessionToken: string) => {
+export const getAddresses = async (userId: string, sessionToken: string) => {
   try {
+    console.log(userId);
+    
     const res = await fetch(`${API_URL}/users/${userId}/addresses/`, {
       method: 'GET',
       headers: {
@@ -25,8 +27,10 @@ export const getAddresses = async (userId: number, sessionToken: string) => {
   }
 };
 
-export const getAddressById = async (userId: number, addressId: number, sessionToken: string) => {
+export const getAddressById = async (userId: string, addressId: number, sessionToken: string) => {
   try {
+    console.log(userId);
+    
     const res = await fetch(`${API_URL}/users/${userId}/addresses/${addressId}/`, {
       method: 'GET',
       headers: {
@@ -55,12 +59,12 @@ export const insertAddress = async (
     street: string;
     zip: string;
   },
-  userId: number,
+  userId: string,
   sessionToken: string
 ) => {
   try {
     console.log(insertedAddressData);
-
+    console.log(userId);
     const res = await fetch(`${API_URL}/users/${userId}/addresses/`, {
       method: 'POST',
       headers: {
@@ -92,13 +96,13 @@ export const updateAddress = async (
     street: string;
     zip: string;
   },
-  userId: number,
+  userId: string,
   addressId:number,
   sessionToken: string
 ) => {
   try {
     console.log("uodatedAddresss: ",updatedAddressData);
-
+    console.log(userId);
     const res = await fetch(`${API_URL}/users/${userId}/addresses/${addressId}/`, {
       method: 'PUT',
       headers: {

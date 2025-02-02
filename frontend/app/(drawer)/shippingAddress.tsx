@@ -24,8 +24,8 @@ export default function ShippingAddressScreen() {
     error,
   } = useQuery<Address[]>({
     queryKey: ['shippingAddresses', sessionUser?.id],
-    queryFn: () => getAddresses(Number(sessionUser?.id), sessionToken!),
-  });
+    queryFn: () => getAddresses(sessionUser?.id!, sessionToken!),
+  }); 
 
   if (isLoading) {
     return (
