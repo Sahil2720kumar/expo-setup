@@ -12,7 +12,7 @@ import { addressesTable, usersTable } from "./usersSchema";
 import { productsTable } from "./productsSchema";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { type InferSelectModel } from "drizzle-orm";
 
 export const ordersTable = pgTable("orders", {
@@ -45,6 +45,7 @@ export const orderItemsTable = pgTable("order_items", {
     .notNull()
     .references(() => productsTable.id, {
       onDelete: "cascade",
+      onUpdate: "cascade",
     }),
 
   quantity: integer("quantity").default(1).notNull(),
@@ -74,3 +75,26 @@ export const insertOrderWithItemsSchema = z.object({
   order: insertOrderSchema,
   items: z.array(insertOrderItemSchema),
 });
+
+//relationships
+export const ordersTableRelations = relations(ordersTable, ({ one, many }) => ({
+  orderItems: many(orderItemsTable),
+  address: one(addressesTable, {
+    fields: [ordersTable.addressId],
+    references: [addressesTable.id],
+  }),
+}));
+
+export const orderItemsTableRelations = relations(
+  orderItemsTable,
+  ({ one }) => ({
+    order: one(ordersTable, {
+      fields: [orderItemsTable.orderId],
+      references: [ordersTable.id],
+    }),
+    product: one(productsTable, {
+      fields: [orderItemsTable.productId],
+      references: [productsTable.id],
+    }),
+  })
+);

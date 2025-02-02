@@ -8,6 +8,6 @@ const router=Router()
 
 router.post("/",verifyToken,validateData(insertOrderWithItemsSchema),insertOrder)
 router.get("/",verifyToken,listOfOrders)
-router.get("/:id",verifyToken,getOrderById)
+router.get("/:orderId/:productId",verifyToken,getOrderById)
 
 export default router;
