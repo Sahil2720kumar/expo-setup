@@ -1,0 +1,4 @@
+phone number should be unique
+--add phone number field in registration
+--add logic that user can't update their phone number
+

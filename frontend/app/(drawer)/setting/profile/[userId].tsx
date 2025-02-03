@@ -10,8 +10,15 @@ import {
   Plus,
   Upload,
 } from 'lucide-react-native';
-import { useState } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 // import { ScrollView } from 'react-native-virtualized-view';
 import { ScrollView } from 'react-native';
@@ -31,19 +38,52 @@ import addressSchema from '~/vaildators/addressSchema';
 import { profileSchema } from '~/vaildators/profileSchema';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import useAuthStore from '~/store/authStore';
+import { useMutation } from '@tanstack/react-query';
+import { updateUser } from '~/api/users';
 
 export default function ProfileScreen() {
-  const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
+  const { userId } = useLocalSearchParams();
 
+  const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
+  const { sessionUser, sessionToken, setSessionUser } = useAuthStore();
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
+  const [errors, setErrors] = useState({});
+  const [mutateError, setMutateError] = useState<string | null>(null);
+  const [isInvalid, setIsInvalid] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
-    phoneNumber: '',
+    phone: '',
   });
+
+  useEffect(() => {
+    setFormData({
+      firstName: sessionUser?.name.split(' ')[0]!,
+      lastName: sessionUser?.name.split(' ')[1]!,
+      email: sessionUser?.email!,
+      phone: sessionUser?.phone!,
+    });
+  }, [sessionUser]);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: { profileImg?: string | null; name: string; phone: string }) =>
+      updateUser(data, sessionUser?.id!, sessionToken!),
+    onSuccess(data) {
+      setSessionUser(data.user);
+      // router.push('/(drawer)/orders');
+    },
+    onError(error) {
+      console.log('update Failed', error);
+      setIsInvalid(true);
+      setMutateError(error.message);
+    },
+  });
+
   const [image, setImage] = useState<string | null>(null);
 
   const uploadImage = async () => {
@@ -65,9 +105,6 @@ export default function ProfileScreen() {
       console.log('Image Uploading Error, ', err);
     }
   };
-  const [errors, setErrors] = useState({});
-
-  const [isInvalid, setIsInvalid] = useState(false);
 
   const handleInputChange = (field, value) => {
     setFormData((prevState) => ({
@@ -76,10 +113,12 @@ export default function ProfileScreen() {
     }));
   };
 
-  const cartItems = [1, 2, 3, 4, 5, 6];
-
   const handleSubmit = async () => {
     console.log('onSubmit...');
+    mutate({
+      name: `${formData.firstName} ${formData.lastName}`,
+      phone: `${formData.phone}`,
+    });
     try {
       const user = await profileSchema.validate(formData, { abortEarly: false }); // Collect all errors
       console.log(user);
@@ -172,7 +211,7 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
                 </View>
                 <Text size="lg" className="mt-[10] text-center text-black ">
-                  New Fashion
+                  {sessionUser?.name}
                 </Text>
               </View>
             </View>
@@ -232,7 +271,7 @@ export default function ProfileScreen() {
                   <Input
                     variant="underlined"
                     size="md"
-                    isDisabled={false}
+                    isDisabled={true}
                     isInvalid={false}
                     isReadOnly={false}
                     className="min-w-[250px]">
@@ -260,17 +299,21 @@ export default function ProfileScreen() {
                     className="min-w-[250px]">
                     <InputField
                       placeholder="Phone number"
-                      onChangeText={(phoneNumber) => handleInputChange('phoneNumber', phoneNumber)}
-                      value={formData.phoneNumber}
+                      onChangeText={(phone) => handleInputChange('phone', phone)}
+                      value={formData.phone}
                       placeholderClassName="text-[#000000]"
                     />
                   </Input>
                   <HStack
-                    className={`mt-1 ${errors.phoneNumber ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
+                    className={`mt-1 ${errors.phone ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
                     <Icon color="#DC3545" as={AlertCircleIcon} className="" />
-                    <Text className="text-[#DC3545]">
-                      {errors.phoneNumber ?? errors.phoneNumber}
-                    </Text>
+                    <Text className="text-[#DC3545]">{errors.phone ?? errors.phone}</Text>
+                  </HStack>
+                  <HStack
+                    className={`mt-1 ${mutateError ? 'flex' : 'hidden'} flex-row items-center gap-1`}
+                    style={{ flexDirection: 'row' }}>
+                    <Icon color="#DC3545" as={AlertCircleIcon} />
+                    <Text className="w-[80%] text-[#DC3545] ">{mutateError ?? mutateError}</Text>
                   </HStack>
                 </View>
               </FormControl>
@@ -290,9 +333,20 @@ export default function ProfileScreen() {
               className="rounded-[28] bg-[#F93C00]"
               style={{ borderRadius: 28, height: 48 }}
               onPress={handleSubmit}>
-              <ButtonText className="uppercase" size="lg">
-                Save
-              </ButtonText>
+              {isPending ? (
+                <View className="flex-row gap-3">
+                  <ActivityIndicator color={'white'} />
+                  <ButtonText size="lg" className="uppercase ">
+                    Loading...
+                  </ButtonText>
+                </View>
+              ) : (
+                <>
+                  <ButtonText size="lg" className="uppercase ">
+                    {'SAVE'}
+                  </ButtonText>
+                </>
+              )}
             </Button>
           </View>
         </View>

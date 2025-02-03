@@ -46,12 +46,12 @@ export const insertAddress = async (req: Request, res: Response) => {
   try {
     const [newInsertedAddress] = await db
       .insert(addressesTable)
-      .values({ ...req.cleanBody, userId: req.userId})
+      .values({ ...req.cleanBody, userId: req.userId })
       .returning();
     res.status(200).json(newInsertedAddress);
   } catch (err) {
     console.log(err);
-    
+
     res
       .status(500)
       .json({ message: "Failed to insert the address", status: 500 });
@@ -169,27 +169,28 @@ export const updateUser = async (req: Request, res: Response) => {
     if (Number(req.userId === userId || req.role === "admin")) {
       const [user] = await db
         .update(usersTable)
-        .set(updatedFields)
-        .where(eq(usersTable.id,userId))
+        .set({...updatedFields,updatedAt:new Date()})
+        .where(eq(usersTable.id, userId))
         .returning();
 
       if (!user) {
         res.status(404).json({ message: "user not found", status: 404 });
         return;
       }
+
+      res.status(200).json({
+        message: "user updated successfull",
+        status: 204,
+        user,
+      });
     } else {
       res
         .status(400)
         .json({ error: "Bad Request: Something went wrong with your input" });
       return;
     }
-
-    res.status(200).json({
-      message: "user updated successfull",
-      status: 204,
-    });
   } catch (err) {
-    // console.log(err);
+    console.log(err);
     res.status(500).json({ message: "Failed to update a user", status: 500 });
   }
 };

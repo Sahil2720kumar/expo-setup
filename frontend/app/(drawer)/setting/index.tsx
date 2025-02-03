@@ -16,15 +16,14 @@ import { Divider } from '~/components/ui/divider';
 import { Image } from '~/components/ui/image';
 import { Text } from '~/components/ui/text';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
+import useAuthStore from '~/store/authStore';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CheckoutScreen() {
   const { marginAuto, minWidth } = useCommonBreakPoints();
-
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
-
-  const cartItems = [1, 2, 3, 4, 5, 6];
+  const { sessionUser } = useAuthStore();
   return (
     <ScrollView
       contentContainerStyle={{
@@ -59,22 +58,22 @@ export default function CheckoutScreen() {
             Setting
           </Text>
           <View className="gap-5">
-            <Link href={`/(drawer)/setting/profile`} asChild>
+            <Link href={`/(drawer)/setting/profile/${sessionUser?.id}`} asChild>
               <TouchableOpacity activeOpacity={0.7} className="gap-0.5">
                 <View className="flex-row items-center justify-between">
                   <Text className="text-lg font-semibold text-black">Profile</Text>
                   <ChevronRight color={'black'} size={20} />
                 </View>
                 <View className="mt-[10]">
-                  <Text className=" text-[#888888]">New Fashion</Text>
-                  <Text className="text-[#888888]">Support@newfashion.design</Text>
-                  <Text className="text-[#888888]">(777) 121-8000</Text>
+                  <Text className=" text-[#888888]">{sessionUser?.name}</Text>
+                  <Text className="text-[#888888]">{sessionUser?.email}</Text>
+                  <Text className="text-[#888888]">{sessionUser?.phone}</Text>
                 </View>
               </TouchableOpacity>
             </Link>
             <Divider className="bg-[#F1F1F1]" />
             <Link href={`/(drawer)/setting/passwordChange`} asChild>
-              <TouchableOpacity activeOpacity={0.7}  className="gap-0.5">
+              <TouchableOpacity activeOpacity={0.7} className="gap-0.5">
                 <View className="flex-row items-center justify-between">
                   <Text className="text-lg font-semibold text-black">Password</Text>
                   <ChevronRight color={'black'} size={20} />

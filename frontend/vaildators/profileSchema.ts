@@ -15,7 +15,7 @@ export const profileSchema = Yup.object().shape({
     .email('Invalid email format')
     .required('Email is required'),
 
-  phoneNumber: Yup.string()
+  phone: Yup.string()
     .matches(
       /^(\+?\d{1,4})?\s?-?\(?\d{3}\)?\s?-?\d{3}\s?-?\d{4}$/,
       'Phone number must be valid (e.g., +1234567890, (123) 456-7890)'

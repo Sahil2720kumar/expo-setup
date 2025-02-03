@@ -34,6 +34,7 @@ const SignUpScreen = () => {
     lastName: '',
     email: '',
     password: '',
+    phone:'',
   });
   const [errors, setErrors] = useState({});
   const [signUpError, setSignUpError] = useState<string | null>(null);
@@ -220,6 +221,27 @@ const SignUpScreen = () => {
                 className={`mt-1 ${errors.password ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
                 <Icon color="#DC3545" as={AlertCircleIcon} className="" />
                 <Text className="text-[#DC3545]"> {errors.password ?? errors.password}</Text>
+              </HStack>
+            </View>
+            <View>
+              <Input
+                variant="underlined"
+                size="md"
+                isDisabled={false}
+                isInvalid={false}
+                isReadOnly={false}>
+                <InputField
+                  placeholder="Phone number"
+                  onChangeText={(phone) => handleInputChange('phone', phone)}
+                  value={formData.phone}
+                  placeholderClassName="text-[#000000]"
+                  keyboardType='numeric'
+                />
+              </Input>
+              <HStack 
+                className={`mt-1 ${errors.phone ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
+                <Icon color="#DC3545" as={AlertCircleIcon} className="" />
+                <Text className="text-[#DC3545]"> {errors.phone ?? errors.phone}</Text>
               </HStack>
               <HStack
                 className={`mt-1 ${signUpError ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
