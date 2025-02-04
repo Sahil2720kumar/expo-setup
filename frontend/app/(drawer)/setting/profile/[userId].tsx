@@ -1,15 +1,8 @@
+import { useMutation } from '@tanstack/react-query';
+import * as ImagePicker from 'expo-image-picker';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import {
-  AlertCircleIcon,
-  ChevronLeft,
-  ChevronRight,
-  EyeIcon,
-  EyeOffIcon,
-  Minus,
-  Package,
-  Plus,
-  Upload,
-} from 'lucide-react-native';
+import { AlertCircleIcon, ChevronLeft, Upload } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -18,30 +11,21 @@ import {
   Platform,
   TouchableOpacity,
   View,
+  ScrollView,
 } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
-// import { ScrollView } from 'react-native-virtualized-view';
-import { ScrollView } from 'react-native';
-import CartItem from '~/components/CartItem';
-import { Bag } from '~/components/Icons';
 
-import { ScreenContent } from '~/components/ScreenContent';
-import { Button, ButtonIcon, ButtonText } from '~/components/ui/button';
+import { updateUser } from '~/api/users';
+import { Button, ButtonText } from '~/components/ui/button';
 import { FormControl } from '~/components/ui/form-control';
 import { HStack } from '~/components/ui/hstack';
 import { Icon } from '~/components/ui/icon';
 import { Image } from '~/components/ui/image';
-import { Input, InputField, InputSlot, InputIcon } from '~/components/ui/input';
+import { Input, InputField } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
-import addressSchema from '~/vaildators/addressSchema';
-import { profileSchema } from '~/vaildators/profileSchema';
-import { useCommonBreakPoints } from '~/utils/breakPoints';
-import * as ImagePicker from 'expo-image-picker';
-import { router, useLocalSearchParams } from 'expo-router';
 import useAuthStore from '~/store/authStore';
-import { useMutation } from '@tanstack/react-query';
-import { updateUser } from '~/api/users';
+import { useCommonBreakPoints } from '~/utils/breakPoints';
+import { profileSchema } from '~/vaildators/profileSchema';
+import * as FileSystem from 'expo-file-system';
 
 export default function ProfileScreen() {
   const { userId } = useLocalSearchParams();
@@ -70,20 +54,6 @@ export default function ProfileScreen() {
     });
   }, [sessionUser]);
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: (data: { profileImg?: string | null; name: string; phone: string }) =>
-      updateUser(data, sessionUser?.id!, sessionToken!),
-    onSuccess(data) {
-      setSessionUser(data.user);
-      // router.push('/(drawer)/orders');
-    },
-    onError(error) {
-      console.log('update Failed', error);
-      setIsInvalid(true);
-      setMutateError(error.message);
-    },
-  });
-
   const [image, setImage] = useState<string | null>(null);
 
   const uploadImage = async () => {
@@ -96,7 +66,7 @@ export default function ProfileScreen() {
         quality: 1,
       });
 
-      console.log(result);
+      // console.log(result);
 
       if (!result.canceled) {
         setImage(result.assets[0].uri);
@@ -113,16 +83,59 @@ export default function ProfileScreen() {
     }));
   };
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      // Remove unused data parameter
+      const formDataCons = new FormData();
+
+      // 1. Append image properly
+      if (image) {
+        console.log('heres');
+
+        formDataCons.append('profileImg', {
+          uri: image,
+          name: 'profile.jpg',
+          type: 'image/jpeg',
+        } as any); // Type assertion for React Native
+      }
+
+      // 2. Use current formData state values
+      formDataCons.append('name', `${formData.firstName} ${formData.lastName}`);
+      formDataCons.append('phone', formData.phone); // Changed from data.phone to formData.phone
+
+
+      //  // 3. Proper logging technique
+      //  console.log('FormData contents:');
+      //  formDataCons.forEach((value, key) => {
+      //    console.log(key, value);
+      //  });
+   
+      return updateUser(formDataCons, sessionUser?.id!, sessionToken!);
+    },
+    onSuccess(data) {
+      setSessionUser(data.user);
+      console.log(data);
+
+      router.push('/(drawer)/setting');
+    },
+    onError(error) {
+      console.log('Update failed:', error);
+      setIsInvalid(true);
+      setMutateError(error.message || 'Unknown error occurred');
+    },
+  });
+
   const handleSubmit = async () => {
     console.log('onSubmit...');
-    mutate({
-      name: `${formData.firstName} ${formData.lastName}`,
-      phone: `${formData.phone}`,
-    });
     try {
       const user = await profileSchema.validate(formData, { abortEarly: false }); // Collect all errors
       console.log(user);
       setErrors({});
+      mutate({
+        name: `${formData.firstName} ${formData.lastName}`,
+        phone: `${formData.phone}`,
+        profileImg: image,
+      });
     } catch (error) {
       if (error.name === 'ValidationError') {
         const fieldErrors = {};
@@ -201,7 +214,13 @@ export default function ProfileScreen() {
                           width: '100%', // Cover full width of the parent
                           height: '100%', // Cover full height of the parent
                         }}
-                        source={image ? { uri: image } : require('assets/defaultUser.png')}
+                        source={
+                          image
+                            ? { uri: image }
+                            : sessionUser?.profileImg
+                              ? { uri: sessionUser.profileImg }
+                              : require('assets/defaultUser.png')
+                        }
                         alt="userImage"
                       />
                     </View>

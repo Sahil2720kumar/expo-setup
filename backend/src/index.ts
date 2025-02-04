@@ -1,5 +1,7 @@
 import express, { json, urlencoded } from "express";
 import cors from "cors"
+import multer from "multer"
+import * as fs from 'fs';
 import productsRoutes from "./routes/products/index.js";
 import authRoutes from "./routes/auth/index.js";
 import ordersRoutes from "./routes/orders/index.js";
@@ -13,6 +15,14 @@ const port = 3000;
 app.use(cors())
 app.use(json());
 app.use(urlencoded({ extended: false }));
+app.use(express.static("public"))
+ 
+
+// Create uploads directory if it doesn't exist
+const dir = './public/uploads';
+if (!fs.existsSync(dir)) {
+  fs.mkdirSync(dir, { recursive: true });
+}
 
 //Products api
 app.use("/products", productsRoutes);

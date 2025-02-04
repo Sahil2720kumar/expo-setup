@@ -1,13 +1,13 @@
-import useAuthStore from "~/store/authStore";
+import useAuthStore from '~/store/authStore';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export const getUserById = async (userId: string,sessionToken:string) => {
+export const getUserById = async (userId: string, sessionToken: string) => {
   try {
     const res = await fetch(`${API_URL}/users/${userId}/`, {
       method: 'GET',
       headers: {
-        'Authorization':sessionToken!
+        Authorization: sessionToken!,
       },
     });
 
@@ -17,7 +17,7 @@ export const getUserById = async (userId: string,sessionToken:string) => {
     }
 
     const data = await res.json();
-     console.log('Fetched data:', data);
+    console.log('Fetched data:', data);
     return data;
   } catch (error) {
     console.error('Fetch failed:', error);
@@ -25,16 +25,20 @@ export const getUserById = async (userId: string,sessionToken:string) => {
   }
 };
 
-
-export const updateUser = async (updatedUser:{profileImg?:string| null,name:string,phone:string},userId: string,sessionToken:string) => {
+export const updateUser = async (
+  formData: FormData, // Accept FormData instead of plain object
+  userId: string,
+  sessionToken: string
+) => {
   try {
+    // console.log(formData);
     const res = await fetch(`${API_URL}/users/${userId}/`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization':sessionToken!
+        // 'Content-Type': 'multipart/form-data',
+        Authorization: sessionToken!,
       },
-      body: JSON.stringify({ ...updatedUser }),
+      body: formData,
     });
 
     if (!res.ok) {
@@ -43,7 +47,7 @@ export const updateUser = async (updatedUser:{profileImg?:string| null,name:stri
     }
 
     const data = await res.json();
-     console.log('Fetched data:', data);
+    console.log('Fetched data:', data);
     return data;
   } catch (error) {
     console.error('Fetch failed:', error);

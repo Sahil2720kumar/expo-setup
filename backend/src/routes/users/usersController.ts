@@ -1,8 +1,14 @@
 import { Request, Response } from "express";
 import { db } from "../../db/index.js";
-import { addressesTable, usersTable } from "../../db/usersSchema.js";
+import {
+  addressesTable,
+  updateUserSchema,
+  usersTable,
+} from "../../db/usersSchema.js";
 import { asc, eq, getTableColumns } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import _ from "lodash";
+import { uploadOnCloudinary } from "../../../utils/cloudinary.js";
 
 export const listOfAddresses = async (req: Request, res: Response) => {
   try {
@@ -88,7 +94,7 @@ export const updateAddress = async (req: Request, res: Response) => {
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    // console.log("user role: ", req.role);
+    //  console.log("user role: ", req.role);
     const { password, ...rest } = getTableColumns(usersTable);
 
     // const allUsers = await db.select({ ...rest }).from(usersTable);
@@ -151,11 +157,20 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
+    req.cleanBody = _.pick(
+      { ...req.body },
+      Object.keys(updateUserSchema.shape)
+    );
     const { userId } = req.params;
     let updatedFields = req.cleanBody;
 
+    // console.log(req.file);
+    // console.log("body", updatedFields);
     // console.log("paramsUserID", userId);
     // console.log("tokenUserId", req.userId);
+
+    const profileImg = await uploadOnCloudinary(req.file?.path || "");
+    // console.log(profileImg);
 
     if (updatedFields.password) {
       // console.log(updatedFields);
@@ -167,11 +182,24 @@ export const updateUser = async (req: Request, res: Response) => {
     }
 
     if (Number(req.userId === userId || req.role === "admin")) {
-      const [user] = await db
-        .update(usersTable)
-        .set({...updatedFields,updatedAt:new Date()})
-        .where(eq(usersTable.id, userId))
-        .returning();
+      let user;
+      if (profileImg) {
+        [user] = await db
+          .update(usersTable)
+          .set({
+            ...updatedFields,
+            profileImg: profileImg,
+            updatedAt: new Date(),
+          })
+          .where(eq(usersTable.id, userId))
+          .returning();
+      } else {
+        [user] = await db
+          .update(usersTable)
+          .set({ ...updatedFields, updatedAt: new Date() })
+          .where(eq(usersTable.id, userId))
+          .returning();
+      }
 
       if (!user) {
         res.status(404).json({ message: "user not found", status: 404 });
