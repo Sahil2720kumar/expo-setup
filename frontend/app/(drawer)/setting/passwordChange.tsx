@@ -11,7 +11,14 @@ import {
   Upload,
 } from 'lucide-react-native';
 import { useState } from 'react';
-import { Dimensions, KeyboardAvoidingView, Platform, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 // import { ScrollView } from 'react-native-virtualized-view';
 import { ScrollView } from 'react-native';
@@ -32,6 +39,9 @@ import profileSchema, { passwordChangeSchema } from '~/vaildators/profileSchema'
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
+import { useMutation } from '@tanstack/react-query';
+import { updateUser } from '~/api/users';
+import useAuthStore from '~/store/authStore';
 
 export default function PasswordChangeScreen() {
   const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
@@ -45,8 +55,9 @@ export default function PasswordChangeScreen() {
   });
 
   const [errors, setErrors] = useState({});
-
+  const [mutateError, setMutateError] = useState<string | null>(null);
   const [isInvalid, setIsInvalid] = useState(false);
+  const { sessionUser, sessionToken, setSessionUser } = useAuthStore();
 
   const handleInputChange = (field, value) => {
     setFormData((prevState) => ({
@@ -55,12 +66,33 @@ export default function PasswordChangeScreen() {
     }));
   };
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      // Remove unused data parameter
+      const formDataCons = new FormData();
+      formDataCons.append('password', formData.newPassword);
+      formDataCons.append("oldPassword",formData.currentPassword)
+      return updateUser(formDataCons, sessionUser?.id!, sessionToken!);
+    },
+    onSuccess(data) {
+      setSessionUser(data.user);
+      console.log(data);
+      router.push('/(drawer)/setting');
+    },
+    onError(error) {
+      console.log('Update failed:', error);
+      setIsInvalid(true);
+      setMutateError(error.message || 'Unknown error occurred');
+    },
+  });
+
   const handleSubmit = async () => {
     console.log('onSubmit...');
     try {
       const user = await passwordChangeSchema.validate(formData, { abortEarly: false }); // Collect all errors
       console.log(user);
       setErrors({});
+      mutate()
     } catch (error) {
       if (error.name === 'ValidationError') {
         const fieldErrors = {};
@@ -203,6 +235,12 @@ export default function PasswordChangeScreen() {
                       {errors.confirmNewPassword ?? errors.confirmNewPassword}
                     </Text>
                   </HStack>
+                  <HStack
+                    className={`mt-1 ${mutateError ? 'flex' : 'hidden'} flex-row items-center gap-1`}
+                    style={{ flexDirection: 'row' }}>
+                    <Icon color="#DC3545" as={AlertCircleIcon} />
+                    <Text className="w-[80%] text-[#DC3545] ">{mutateError ?? mutateError}</Text>
+                  </HStack>
                 </View>
               </FormControl>
             </View>
@@ -221,9 +259,20 @@ export default function PasswordChangeScreen() {
               className="rounded-[28] bg-[#F93C00]"
               style={{ borderRadius: 28, height: 48 }}
               onPress={handleSubmit}>
-              <ButtonText className="uppercase" size="lg">
-                Save
-              </ButtonText>
+              {isPending ? (
+                <View className="flex-row gap-3">
+                  <ActivityIndicator color={'white'} />
+                  <ButtonText size="lg" className="uppercase ">
+                    Loading...
+                  </ButtonText>
+                </View>
+              ) : (
+                <>
+                  <ButtonText size="lg" className="uppercase ">
+                    {'SAVE'}
+                  </ButtonText>
+                </>
+              )}
             </Button>
           </View>
         </View>

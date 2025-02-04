@@ -163,9 +163,10 @@ export const updateUser = async (req: Request, res: Response) => {
     );
     const { userId } = req.params;
     let updatedFields = req.cleanBody;
+    const {oldPassword}={...req.body}
 
     // console.log(req.file);
-    // console.log("body", updatedFields);
+     console.log("body", updatedFields,oldPassword);
     // console.log("paramsUserID", userId);
     // console.log("tokenUserId", req.userId);
 
@@ -174,6 +175,16 @@ export const updateUser = async (req: Request, res: Response) => {
 
     if (updatedFields.password) {
       // console.log(updatedFields);
+      const [userExist] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, req.userId!));
+      
+      if (!userExist || !bcrypt.compareSync(oldPassword, userExist.password)) {
+        res.status(401).json({ message: "Old password incorrect, plz enter correct password", status: 401 });
+        return; // End the function after sending the response
+      }
+
       const hashedPassword = await bcrypt.hashSync(
         updatedFields.password,
         Number(process.env.BCRYPT_SALT)
