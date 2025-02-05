@@ -117,7 +117,7 @@ const FilterDrawer = memo(({ handleProductsFilters }) => {
   const memorizedClothPriceRanges = useMemo(() => clothPriceRanges, []);
 
   const handleApplyFilter = () => {
-    console.log(filters);
+    // console.log(filters);
     handleProductsFilters(filters)
   };
 

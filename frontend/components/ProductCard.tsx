@@ -23,7 +23,7 @@ export default function ProductCard({
           />
         </View>
         <View className="mt-1.5">
-          <Text className="text-black">{name}</Text>
+          <Text numberOfLines={1} isTruncated className="text-black">{name}</Text>
           <Text
             style={{ display: description !== '' ? 'flex' : 'none' }}
             numberOfLines={1}

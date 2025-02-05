@@ -16,15 +16,21 @@ import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 const ProductsScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterOptions, setFilterOptions] = useState(null);
   // const totalPages = 10; // Example total number of pages
   const { marginAuto, minWidth, iconProductSize: iconSize, noColumns } = useCommonBreakPoints();
-   
-  const { data:productsData,isPlaceholderData, isLoading, error } = useQuery({
-    queryKey: ['products',currentPage],
-    queryFn: () => getAllProducts(currentPage),
-    placeholderData: keepPreviousData
+
+  const {
+    data: productsData,
+    isPlaceholderData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['products', currentPage,filterOptions],
+    queryFn: () => getAllProducts(currentPage, 6, filterOptions),
+    placeholderData: keepPreviousData,
   });
- 
+
   if (isLoading) {
     return (
       <View
@@ -53,14 +59,16 @@ const ProductsScreen = () => {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
-    
+
     // Here you would typically fetch data for the new page
     console.log(`Fetching data for page ${newPage}`);
   };
   // const []=useState(products)
 
   const handleProductsFilters = (data) => {
-    console.log('print from produts: ', data);
+    // console.log('print from produts: ', data);
+    setFilterOptions(data);
+    setCurrentPage(1)
   };
 
   return (
@@ -101,10 +109,10 @@ const ProductsScreen = () => {
           <View className=" w-full  items-center">
             <FlatList
               key={noColumns}
-              className="w-full items-center"
+              className="w-full items-start"
               columnWrapperClassName={`gap-y-2 ${noColumns !== 2 ? 'gap-x-4' : 'gap-x-2'}`}
               numColumns={noColumns}
-              data={productsData.productsList.slice(0, 6)}
+              data={productsData.productsList}
               renderItem={({ item }) => (
                 <ProductCard
                   key={item.id}
@@ -118,8 +126,8 @@ const ProductsScreen = () => {
           </View>
           <View className="pt-[32] md:pt-11  ">
             <Pagination
-               currentPage={currentPage}
-              totalPages={Math.ceil(productsData.totalProductsCount/6)}
+              currentPage={currentPage}
+              totalPages={Math.ceil(productsData.totalProductsCount / 6)}
               onPageChange={handlePageChange}
             />
           </View>

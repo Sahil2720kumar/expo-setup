@@ -1,30 +1,119 @@
 import { Request, Response } from "express";
 import { db } from "../../db/index.js";
 import { insertProductSchema, productsTable } from "../../db/productsSchema.js";
-import { count, desc, eq } from "drizzle-orm";
+import { between, count, desc, eq, inArray } from "drizzle-orm";
 import _ from "lodash";
-import products from "./index.js";
+import { and, gte, lte, ilike, sql, contains } from "drizzle-orm";
 
-const listOfProducts = async (req: Request, res: Response) => {
+const listOfProducts = async (req, res) => {
   try {
-    const { page, pageSize } = req.query;
-    // console.log({ page, pageSize });
+    const { page = 1, pageSize = 6 } = req.query;
+
+    const categories = req.query.categories
+      ? JSON.parse(req.query.categories)
+      : [];
+    const colors = req.query.colors ? JSON.parse(req.query.colors) : [];
+    const sizes = req.query.sizes ? JSON.parse(req.query.sizes) : [];
+    const genderAndAgeCategories = req.query.genderAndAgeCategories
+      ? JSON.parse(req.query.genderAndAgeCategories)
+      : [];
+    const brands = req.query.brands ? JSON.parse(req.query.brands) : [];
+    const priceRange = req.query.priceRange
+      ? JSON.parse(req.query.priceRange)
+      : [];
+    // console.log(
+    //   categories, //[shirt tops]
+    //   colors, //[red,blue]
+    //   sizes, //[S,M,XL]
+    //   genderAndAgeCategories, //[Men,woman]
+    //   brands, //[Nike,punna]
+    //   priceRange //[0-2000]
+    // );
+
+    //next task begins from here...
+    const conditions: string | any[] = [];
+
+    if (colors.length) {
+      colors.forEach(color => {
+        conditions.push(
+          sql`EXISTS (
+            SELECT 1 FROM jsonb_array_elements_text(${productsTable.color}::jsonb) AS elem
+            WHERE LOWER(elem) = LOWER(${color})
+          )`
+        );
+      });
+    }
+
+    if (sizes.length) {
+      sizes.forEach(size => {
+        conditions.push(
+          sql`EXISTS (
+            SELECT 1 FROM jsonb_array_elements_text(${productsTable.size}::jsonb) AS size_elem
+            WHERE LOWER(size_elem) = LOWER(${size})
+          )`
+        );
+      });
+    }
+
+    if (genderAndAgeCategories.length) {
+      conditions.push(
+        sql`LOWER(${productsTable.category}) = ANY(ARRAY[${sql.join(genderAndAgeCategories.map(cat => sql`${cat.toLowerCase()}`), sql`, `)}]::text[])`
+      );
+    }
+
+    if (categories.length) {
+      conditions.push(
+        sql`LOWER(${productsTable.subcategory}) = ANY(
+          ARRAY[${sql.join(categories.map(cat => sql`${cat.toLowerCase()}`), sql`, `)}]::text[]
+        )`
+      );
+    }
+    
+    if (brands.length) {
+      conditions.push(
+        sql`LOWER(${productsTable.brand}) = ANY(
+          ARRAY[${sql.join(brands.map(brand => sql`${brand.toLowerCase()}`), sql`, `)}]::text[]
+        )`
+      );
+    }
+
+
+
+    if (priceRange.length) {
+      console.log("price range",priceRange);
+      
+      console.log(priceRange[0].split("-")[0], // min price
+      priceRange[0].split("-")[0])
+      
+      conditions.push(
+        between(
+          productsTable.price,
+          Number(priceRange[0].split("-")[0]), // min price
+          Number(priceRange[0].split("-")[1])// max price
+        )
+      );
+    }
 
     const productsList = await db.query.productsTable.findMany({
-      orderBy: (users, { asc }) => asc(productsTable.id),
+      where: conditions.length ? and(...conditions) : undefined,
+      orderBy: (products, { asc }) => asc(products.id),
       limit: Number(pageSize),
       offset: (Number(page) - 1) * Number(pageSize),
     });
-     
-    const totalProductsCount = await db.select({ count: count() }).from(productsTable);
-     
-    res.status(200).json({totalProductsCount:totalProductsCount[0].count,productsList});
+
+    const totalProductsCount = await db
+      .select({ count: count() })
+      .from(productsTable);
+    // console.log(productsList);
+
+    res.status(200).json({
+      totalProductsCount: totalProductsCount[0].count,
+      productsList,
+    });
   } catch (err) {
-    // console.log(err);
-    
     res
       .status(500)
-      .json({ message: "Failed to fetch all the productsTable", status: 500 });
+      .json({ message: "Failed to fetch products", error: err.message });
   }
 };
 
