@@ -1,0 +1,1 @@
+ALTER TABLE "contacts" ADD COLUMN "contact_img" varchar(500) DEFAULT null;

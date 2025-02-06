@@ -22,6 +22,27 @@
       "when": 1738513482259,
       "tag": "0002_complete_doorman",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1738815821774,
+      "tag": "0003_freezing_champions",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1738818471065,
+      "tag": "0004_normal_timeslip",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1738819202997,
+      "tag": "0005_young_franklin_richards",
+      "breakpoints": true
     }
   ]
 }

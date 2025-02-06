@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { AlertCircleIcon, Image } from 'lucide-react-native';
 import { useState } from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   KeyboardAvoidingView,
   Platform,
@@ -30,10 +31,13 @@ import { useCommonBreakPoints } from '~/utils/breakPoints';
 import * as ImagePicker from 'expo-image-picker';
 import { Textarea, TextareaInput } from '~/components/ui/textarea';
 import { Link } from 'expo-router';
+import { useMutation } from '@tanstack/react-query';
+import contactSchema from '~/vaildators/contactShema';
+import { insertContact } from '~/api/contacts';
 
 export default function ProfileScreen() {
   const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
-
+  const [mutateError, setMutateError] = useState<string | null>(null);
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   const [formData, setFormData] = useState({
@@ -41,8 +45,9 @@ export default function ProfileScreen() {
     lastName: '',
     email: '',
     phoneNumber: '',
+    message: '',
   });
-  const [image, setImage] = useState<string | null>(null);
+  const [contactImg, setContactImg] = useState<string | null>(null);
 
   const uploadImage = async () => {
     try {
@@ -56,7 +61,7 @@ export default function ProfileScreen() {
       console.log(result);
 
       if (!result.canceled) {
-        setImage(result.assets[0].uri);
+        setContactImg(result.assets[0].uri);
       }
     } catch (err) {
       console.log('Image Uploading Error, ', err);
@@ -73,14 +78,53 @@ export default function ProfileScreen() {
     }));
   };
 
-  const cartItems = [1, 2, 3, 4, 5, 6];
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      // Remove unused data parameter
+      const formDataCons = new FormData();
+
+      // 1. Append image properly
+      if (contactImg) {
+        console.log('heres');
+
+        formDataCons.append('contactImg', {
+          uri: contactImg,
+          name: 'profile.jpg',
+          type: 'image/jpeg',
+        } as any); // Type assertion for React Native
+      }
+
+      // 2. Use current formData state values
+      formDataCons.append('name', `${formData.firstName} ${formData.lastName}`);
+      formDataCons.append('phone', formData.phoneNumber); // Changed from data.phone to formData.phone
+      formDataCons.append('email', formData.email); // Changed from data.phone to formData.phone
+      formDataCons.append('message', formData.message); // Changed from data.phone to formData.phone
+
+      //  // 3. Proper logging technique
+      //  console.log('FormData contents:');
+      //  formDataCons.forEach((value, key) => {
+      //    console.log(key, value);
+      //  });
+
+      return insertContact(formDataCons);
+    },
+    onSuccess(data) {
+      console.log(data);
+    },
+    onError(error) {
+      console.log('failed:', error);
+      setIsInvalid(true);
+      setMutateError(error.message || 'Unknown error occurred');
+    },
+  });
 
   const handleSubmit = async () => {
     console.log('onSubmit...');
     try {
-      const user = await profileSchema.validate(formData, { abortEarly: false }); // Collect all errors
+      const user = await contactSchema.validate(formData, { abortEarly: false }); // Collect all errors
       console.log(user);
       setErrors({});
+      mutate();
     } catch (error) {
       if (error.name === 'ValidationError') {
         const fieldErrors = {};
@@ -243,17 +287,30 @@ export default function ProfileScreen() {
                     className="min-w-[250px]">
                     <InputField
                       placeholder="Leave a comment..."
-                      onChangeText={(phoneNumber) => handleInputChange('phoneNumber', phoneNumber)}
-                      value={formData.phoneNumber}
+                      onChangeText={(message) => handleInputChange('message', message)}
+                      value={formData.message}
                       placeholderClassName="text-[#000000]"
                     />
                   </Input>
+                  <HStack
+                    className={`mt-1 ${errors.message ? 'flex' : 'hidden'} flex-row items-center gap-1`}>
+                    <Icon color="#DC3545" as={AlertCircleIcon} className="" />
+                    <Text className="text-[#DC3545]"> {errors.message ?? errors.message}</Text>
+                  </HStack>
+                  <HStack
+                    className={`mt-1 ${mutateError ? 'flex' : 'hidden'} flex-row items-center gap-1`}
+                    style={{ flexDirection: 'row' }}>
+                    <Icon color="#DC3545" as={AlertCircleIcon} />
+                    <Text className="w-[80%] text-[#DC3545] ">{mutateError ?? mutateError}</Text>
+                  </HStack>
                 </View>
                 <Pressable onPress={uploadImage}>
                   <View className="flex min-w-[250px] flex-row items-center border-b border-gray-300">
-                    <Image size={24} color={`${image?'black':"#888888"}`} />
-                    <Text numberOfLines={1}  className={`ml-2 text-sm ${image?'text-[#000000]':'text-[#888888]'}`}>
-                      {image || 'Choose a screenshot'}
+                    <Image size={24} color={`${contactImg ? 'black' : '#888888'}`} />
+                    <Text
+                      numberOfLines={1}
+                      className={`ml-2 text-sm ${contactImg ? 'text-[#000000]' : 'text-[#888888]'}`}>
+                      {contactImg || 'Choose a screenshot'}
                     </Text>
                   </View>
                 </Pressable>
@@ -268,16 +325,27 @@ export default function ProfileScreen() {
               justifyContent: 'flex-end',
               backgroundColor: '',
             }}>
-              {/* <Link href={"/hh"}>click me</Link> */}
+            {/* <Link href={"/hh"}>click me</Link> */}
             <Button
               size="md"
               variant="solid"
               className="rounded-[28] bg-[#F93C00]"
               style={{ borderRadius: 28, height: 48 }}
               onPress={handleSubmit}>
-              <ButtonText className="uppercase" size="lg">
-                Save
-              </ButtonText>
+              {isPending ? (
+                <View className="flex-row gap-3">
+                  <ActivityIndicator color={'white'} />
+                  <ButtonText size="lg" className="uppercase ">
+                    Loading...
+                  </ButtonText>
+                </View>
+              ) : (
+                <>
+                  <ButtonText size="lg" className="uppercase ">
+                    {'SAVE'}
+                  </ButtonText>
+                </>
+              )}
             </Button>
           </View>
         </View>
