@@ -3,22 +3,30 @@ import { View, FlatList, StyleSheet, Platform, Image } from 'react-native';
 import clothImage from './../assets/cloth.png';
 import { Button, ButtonText } from './ui/button';
 import { Text } from './ui/text';
-// import { Image } from './ui/image';
+import { router } from 'expo-router';
 
-//Memo not work in this case
-const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
+const Carousel = ({ isClickable = false, data, buttonVisible, height: carouselHeight }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   const flatListRef = useRef(null);
 
   const renderItem = ({ item }) => (
-    <View style={[styles.itemContainer, { width: containerWidth }]}>
-      <Image resizeMode="cover" source={item?.image?{uri:item?.image}:clothImage} style={styles.image} />
-
+    <View style={{ width: containerWidth,minHeight:carouselHeight,backgroundColor:"" }}>
+      <Image resizeMode="cover" source={item?.image ? { uri: item?.image } : clothImage} style={[styles.image,{height:carouselHeight}]} />
       <Text size="xl" style={styles.title}>
-        LACOSTE
+        DROPSQUAD
       </Text>
+      <Button
+        className="bottom-[90] rounded-[30] bg-[#F93C00] "
+        style={[styles.button, { display: buttonVisible ? 'flex' : 'none' }]}
+        size="xl"
+        onPress={()=>router.push(`/(drawer)/products?category=${item.title}`)}
+        variant="solid"
+        action="primary">
+        <ButtonText className='text-center'>View Collection</ButtonText>
+      </Button>
     </View>
+    // <Text>Okkk</Text>
   );
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
@@ -31,9 +39,10 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
     itemVisiblePercentThreshold: 50,
   }).current;
 
+  
   return (
     <View
-      style={[styles.container, { height: carouselHeight,flex:1 }]}
+      style={[styles.container, { maxHeight: carouselHeight, flex: 1 }]}
       onLayout={(event) => {
         const { width } = event.nativeEvent.layout;
         setContainerWidth(width);
@@ -42,7 +51,6 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
         ref={flatListRef}
         data={data}
         renderItem={renderItem}
-        // className='bg-blue-400 '
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -61,14 +69,6 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
           />
         ))}
       </View>
-      <Button
-        className="bottom-[90] rounded-[30] bg-[#F93C00] "
-        style={[styles.button, { display: buttonVisible ? 'flex' : 'none' }]}
-        size="xl"
-        variant="solid"
-        action="primary">
-        <ButtonText className='text-center'>View Collection</ButtonText>
-      </Button>
     </View>
   );
 };
@@ -77,15 +77,16 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 10,
     overflow: 'hidden',
-    // flex:1,
-    //  backgroundColor:"red"
   },
   itemContainer: {
-    height: '100%', // Match container height
     position: 'relative',
-    // backgroundColor: 'pink',
-    ...(Platform.OS === 'web' && {
-      aspectRatio: 1 / 1.85, // Web-specific style
+    flexDirection: 'column', // Ensure children stack vertically
+    alignItems: 'center', // Center horizontally
+    justifyContent: 'center', // Center vertically
+    ...Platform.select({
+      web: {
+        aspectRatio: 1 / 1.85,
+      },
     }),
   },
   image: {
@@ -103,8 +104,7 @@ const styles = StyleSheet.create({
   },
   button: {
     position: 'absolute',
-    //bottom: 90,
-    left: '50%',
+    left: '45%',
     transform: [{ translateX: -70 }],
   },
   pagination: {

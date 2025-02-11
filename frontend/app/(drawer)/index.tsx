@@ -1,5 +1,12 @@
 import { Stack } from 'expo-router';
-import { Dimensions, View, FlatList, TouchableOpacity, Platform } from 'react-native';
+import {
+  Dimensions,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Platform,
+  ActivityIndicator,
+} from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
 // import { ScrollView } from 'react-native';
 import Carousel from '~/components/Carousel';
@@ -11,6 +18,8 @@ import { Text } from '~/components/ui/text';
 import { ListChecks, Truck, UserRoundCheck } from 'lucide-react-native';
 import Footer from '~/components/Footer';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
+import { useQuery } from '@tanstack/react-query';
+import { getAllProducts } from '~/api/products';
 
 export default function Home() {
   const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
@@ -25,9 +34,9 @@ export default function Home() {
   });
 
   const carouselData = [
-    { id: 1, title: 'Item 1', image: 'https://via.placeholder.com/300x200?text=Item+1' },
-    { id: 2, title: 'Item 2', image: 'https://via.placeholder.com/300x200?text=Item+2' },
-    { id: 3, title: 'Item 3', image: 'https://via.placeholder.com/300x200?text=Item+3' },
+    { id: 1, title: 'Men', image: 'https://images.pexels.com/photos/846741/pexels-photo-846741.jpeg?auto=compress&cs=tinysrgb&w=400' },
+    { id: 2, title: 'Women', image: 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=400' },
+    { id: 3, title: 'Kids', image: 'https://images.pexels.com/photos/1619801/pexels-photo-1619801.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
   ];
   const sliderData = [1, 2, 34, 4, 5];
   const tags = [
@@ -41,6 +50,15 @@ export default function Home() {
     '#dropsquad',
   ];
 
+  const {
+    data: productsSliderData,
+    isLoading: productsSliderIsLoading,
+    error,
+  } = useQuery({
+    queryKey: ['products', 1],
+    queryFn: () => getAllProducts(1, 20),
+  });
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -51,17 +69,17 @@ export default function Home() {
       }}
       showsVerticalScrollIndicator={false}>
       {/* CAROUSEL SECTION */}
-      <View style={{ flex: 1, minHeight: 600,maxHeight:700 }}>
-        <Carousel data={carouselData} buttonVisible={true} height={700}  />
+      <View style={{ flex: 1, minHeight: 600, maxHeight: 700 }}>
+        <Carousel isClickable={true} data={carouselData} buttonVisible={true} height={700} />
       </View>
 
       {/* PRODUCT CATEGORY TABS */}
-      <View style={{ paddingVertical: 20 }}>
+      {/* <View style={{ paddingVertical: 20 }}>
         <Text size="2xl" style={{ textAlign: 'center', fontWeight: '600', color: 'black' }}>
           NEW ONES
         </Text>
         <ProductCategoryTabs />
-      </View>
+      </View> */}
 
       {/* JUST FOR CUSTOMERS SECTION  */}
       <View style={{ marginTop: 40, height: calculatedHeight, maxHeight: 700 }}>
@@ -69,15 +87,26 @@ export default function Home() {
           JUST FOR YOU
         </Text>
         <View className="">
-          <FlatList
-            data={sliderData}
-            renderItem={({ item }) => (
-              <ProductSliderCard width={207} height={304} imageHeight={'81%'} />
-            )}
-            horizontal
-            contentContainerStyle={{ gap: 16, paddingHorizontal: 16, flexGrow: 1 }}
-            showsHorizontalScrollIndicator={false}
-          />
+          {productsSliderIsLoading ? (
+            <View
+              style={{
+                height: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <ActivityIndicator size={'large'} />
+            </View>
+          ) : (
+            <FlatList
+              data={productsSliderData.productsList}
+              renderItem={({ item }) => (
+                <ProductSliderCard item={item} width={207} height={304} imageHeight={'81%'} />
+              )}
+              horizontal
+              contentContainerStyle={{ gap: 16, paddingHorizontal: 16, flexGrow: 1 }}
+              showsHorizontalScrollIndicator={false}
+            />
+          )}
         </View>
         <Text
           size="2xl"

@@ -106,7 +106,7 @@ const listOfProducts = async (req:Request, res:Response) => {
 
     const productsList = await db.query.productsTable.findMany({
       where: conditions.length ? and(...conditions) : undefined,
-      orderBy: (products, { asc }) => asc(products.id),
+      orderBy: (products, { desc }) => desc(products.id),
       limit: Number(pageSize),
       offset: (Number(page) - 1) * Number(pageSize),
     });

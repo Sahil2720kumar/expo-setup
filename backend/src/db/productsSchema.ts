@@ -10,7 +10,7 @@ import {
   text,
   varchar,
 } from "drizzle-orm/pg-core";
-import { type InferSelectModel  } from "drizzle-orm";
+import { sql, type InferSelectModel  } from "drizzle-orm";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
  
 export const productsTable = pgTable("products", {
@@ -19,6 +19,8 @@ export const productsTable = pgTable("products", {
   subcategory: varchar({ length: 255 }).notNull(),
   name: varchar({ length: 255 }).notNull(),
   description: text().notNull(),
+  materials:text().default(sql`null`),
+  care:text().default(sql`null`),
   price: doublePrecision().notNull(),
   size: json().notNull(), // Array of sizes, e.g., ["S", "M", "L", "XL"]
   color: json().notNull(), // Array of colors, e.g., ["White", "Black", "Blue"]

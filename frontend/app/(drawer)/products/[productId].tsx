@@ -14,7 +14,7 @@ import Footer from '~/components/Footer';
 import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
-import { getProductById } from '~/api/products';
+import { getAllProducts, getProductById } from '~/api/products';
 import { useQuery } from '@tanstack/react-query';
 import { Product } from '~/types';
 import useCartStore from '~/store/cartStore';
@@ -43,6 +43,10 @@ const ProductDetailsScreen = () => {
     { id: 3, icon: DoNotUse, description: 'Do not use bleach' },
     { id: 4, icon: DoNotDryTumble, description: 'Do not tumble dry' },
   ];
+  const [isProductDataReady, setIsProductDataReady] = useState(false);
+  const [filterOptions, setFilterOptions] = useState({
+    genderAndAgeCategories: [],
+  });
 
   const {
     data: productData,
@@ -53,16 +57,35 @@ const ProductDetailsScreen = () => {
     queryFn: () => getProductById(Number(productId)),
   });
 
+  useEffect(() => {
+    if (productData?.id) {
+      setFilterOptions({
+        genderAndAgeCategories: [productData.category],
+      });
+      setIsProductDataReady(true);
+    }
+  }, [productData]);
+
+  const {
+    data: recommendationsProductsData,
+    isLoading: recommendationIsLoading,
+    error: recommendationsError,
+  } = useQuery({
+    queryKey: ['recommendationProducts', filterOptions],
+    queryFn: () => getAllProducts(1, 20, filterOptions),
+    initialData: [],
+    enabled: isProductDataReady,
+  });
+
   const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
   const [selectedSize, setSelectedSize] = useState('S');
-  
+
   useEffect(() => {
     if (productData?.color?.length > 0) {
       setSelectedColor(productData.color[0]); // Set the first available color when data is loaded
-      setSelectedSize(productData?.size[1])
+      setSelectedSize(productData?.size[1]);
     }
   }, [productData]); // Runs when `productData` changes
-
 
   const carouselData = useMemo(
     () =>
@@ -73,14 +96,15 @@ const ProductDetailsScreen = () => {
         };
       }),
     [productData]
-  ); // Empty dependency array means it will only be created once
-  console.log("datat",carouselData);
+  );
+
+  // console.log('datat', carouselData);
 
   const addToCart = () => {
     if (!sessionUser || !sessionToken) {
       router.push('/(drawer)/(auth)/signIn');
-    }    
-     addProduct(productData!,selectedSize,selectedColor!);
+    }
+    addProduct(productData!, selectedSize, selectedColor!);
   };
 
   if (isLoading) {
@@ -138,8 +162,9 @@ const ProductDetailsScreen = () => {
       </View>
       <View className="h-[100%] flex-1">
         {/* PRODUCT IMAGE CAROUSEL */}
-        <View className="mt-4" style={{ height: calculatedHeight, maxHeight: 900 }}>
-          <Carousel data={carouselData} buttonVisible={false} height={'100%'} />
+
+        <View className="mb-4 mt-4" style={{ flex: 1, minHeight: 600, maxHeight: 700 }}>
+          <Carousel isClickable={true} data={carouselData} buttonVisible={false} height={700} />
         </View>
 
         {/* PRODUCT DETAILS SECTION */}
@@ -158,12 +183,12 @@ const ProductDetailsScreen = () => {
                 className="text-md w-full text-[#888888]">
                 {productData?.description}
               </Text>
-              {/* <Text
+              <Text
                 numberOfLines={2}
                 ellipsizeMode="tail"
                 className="text-md w-full text-[#888888]">
                 For {productData?.category}
-              </Text> */}
+              </Text>
               <Text className="w-full text-xl font-bold text-[#F93C00]">{productData?.price}</Text>
             </View>
             <TouchableOpacity
@@ -185,8 +210,8 @@ const ProductDetailsScreen = () => {
                 <TouchableOpacity
                   key={color}
                   activeOpacity={0.7}
-                  onPress={()=>setSelectedColor(color)}
-                  className={`h-[26] w-[26] rounded-[12] ${selectedColor===color?" border-2 border-[#888888]":""} p-0.5 `}>
+                  onPress={() => setSelectedColor(color)}
+                  className={`h-[26] w-[26] rounded-[12] ${selectedColor === color ? ' border-2 border-[#888888]' : ''} p-0.5 `}>
                   <View
                     className="flex-1 rounded-[10]"
                     style={{ backgroundColor: color.toLowerCase() }}
@@ -200,11 +225,14 @@ const ProductDetailsScreen = () => {
                 <TouchableOpacity
                   key={index}
                   activeOpacity={0.7}
-                  onPress={()=>setSelectedSize(size)}
-                  className={`h-[28] w-[28] items-center justify-center rounded-[13] items-center jus ${selectedSize===size?"bg-[#F93C00]":" border-2 border-[#F1F1F1]"}`}
+                  onPress={() => setSelectedSize(size)}
+                  className={`jus h-[28] w-[28] items-center items-center justify-center rounded-[13] ${selectedSize === size ? 'bg-[#F93C00]' : ' border-2 border-[#F1F1F1]'}`}
                   // className="h-[28] w-[28] bg-slate-700"
-                  >
-                  <Text className={`font-semibold  ${selectedSize===size?"text-white":" text-[#888888]"}`}>{size}</Text>
+                >
+                  <Text
+                    className={`font-semibold  ${selectedSize === size ? 'text-white' : ' text-[#888888]'}`}>
+                    {size}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -217,8 +245,9 @@ const ProductDetailsScreen = () => {
           <View className="gap-1.5">
             <Text className="text-lg font-semibold text-[#000000]">MATERIALS</Text>
             <Text className="text-[#888888]">
-              We work with monitoring programmes to ensure compliance with safety, health and
-              quality standards for our products.
+              {productData?.materials}
+              {/* We work with monitoring programmes to ensure compliance with safety, health and
+              quality standards for our products. */}
             </Text>
           </View>
 
@@ -227,9 +256,10 @@ const ProductDetailsScreen = () => {
             <View className="gap-1.5">
               <Text className="text-lg font-semibold text-[#000000]">CARE</Text>
               <Text className="text-[#888888]">
-                To keep your jackets and coats clean, you only need to freshen them up and go over
+                {productData?.care}
+                {/* To keep your jackets and coats clean, you only need to freshen them up and go over
                 them with a cloth or a clothes brush. If you need to dry clean a garment, look for a
-                dry cleaner that uses technologies that are respectful of the environment.
+                dry cleaner that uses technologies that are respectful of the environment. */}
               </Text>
             </View>
             <View>
@@ -261,19 +291,31 @@ const ProductDetailsScreen = () => {
           <View className="mt-[60]">
             <Text className="text-center text-2xl font-bold text-black">YOU MAY ALSO LIKE</Text>
             <View className="">
-              <FlatList
-                data={sliderData}
-                renderItem={({ item }) => (
-                  <ProductSliderCard
-                    width={168}
-                    height={268}
-                    description="Short sleeve polo shirt"
-                  />
-                )}
-                horizontal
-                contentContainerClassName="gap-4"
-                showsHorizontalScrollIndicator={false}
-              />
+              {recommendationIsLoading ? (
+                <View
+                  style={{
+                    height: '100%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <ActivityIndicator size={'large'} />
+                </View>
+              ) : (
+                <FlatList
+                  data={recommendationsProductsData.productsList}
+                  renderItem={({ item }) => (
+                    <ProductSliderCard
+                      width={168}
+                      height={268}
+                      description="Short sleeve polo shirt"
+                      item={item}
+                    />
+                  )}
+                  horizontal
+                  contentContainerClassName="gap-4"
+                  showsHorizontalScrollIndicator={false}
+                />
+              )}
             </View>
           </View>
 

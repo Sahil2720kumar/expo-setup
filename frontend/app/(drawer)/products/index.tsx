@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { LayoutList } from 'lucide-react-native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, FlatList, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
 
@@ -13,8 +13,12 @@ import ProductCard from '~/components/ProductCard';
 import { Button } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
+import { useLocalSearchParams } from 'expo-router';
 
 const ProductsScreen = () => {
+  const { category } = useLocalSearchParams();
+  console.log(category);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [filterOptions, setFilterOptions] = useState(null);
   // const totalPages = 10; // Example total number of pages
@@ -25,6 +29,14 @@ const ProductsScreen = () => {
     setFilterOptions(data);
     setCurrentPage(1);
   }, []);
+
+  useEffect(() => {
+    if (category) {
+      setFilterOptions({
+        genderAndAgeCategories: [category],
+      });
+    }
+  }, [category]);
 
   const {
     data: productsData,
@@ -71,9 +83,8 @@ const ProductsScreen = () => {
   };
   // const []=useState(products)
 
-
   console.log(productsData);
-  
+
   return (
     <ScrollView
       contentContainerStyle={{

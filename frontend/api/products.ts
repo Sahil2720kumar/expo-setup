@@ -6,10 +6,7 @@ export const getAllProducts = async (page = 1, pageSize = 6, filterOptions = {})
     const queryParams = new URLSearchParams({
       page: page.toString(),
       pageSize: pageSize.toString(),
-    });
-
-    console.log(filterOptions);
-    
+    });    
 
     // Append filter options if they exist
     if (filterOptions) {

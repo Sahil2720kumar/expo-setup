@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Link, router, useSegments } from 'expo-router';
+import { Link, router, useNavigation, useSegments } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import { HomeIcon, MapPin, PhoneIcon, Settings, Shirt, ShoppingCart } from 'lucide-react-native';
 
@@ -23,7 +23,7 @@ const DrawerLayout = () => {
   const protectedRoutes = ['checkout', 'orders', 'setting', 'shippingAddress'];
   const isProtectedRoute = protectedRoutes.includes(segments[1]!);
   // console.log(isProtectedRoute, segments[1]);
-
+  
   useEffect(() => {
     if (!sessionUser && !sessionToken && isProtectedRoute) {
       router.replace('/(drawer)/(auth)/signIn');
@@ -116,6 +116,12 @@ const DrawerLayout = () => {
             <Icon as={Shirt} size="xl" className="text-typography-600" color={color} />
           ),
         }}
+        listeners={({ navigation }) => ({
+          drawerItemPress: () => {
+            // navigation.navigate('products'); // Navigate without parameters
+            router.push("/(drawer)/products")
+          },
+        })}
       />
       {/* <Drawer.Screen
       name="setting/profile"

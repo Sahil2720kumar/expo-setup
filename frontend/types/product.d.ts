@@ -4,6 +4,8 @@ export interface Product {
   subcategory: string;
   name: string;
   description: string;
+  materials:string,
+  care:string,
   price: number;
   size: string[];
   color: string[];
