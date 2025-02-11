@@ -1,4 +1,4 @@
 phone number should be unique
 --add phone number field in registration
 --add logic that user can't update their phone number
-ngrok authToken=NGROK_AUTHTOKEN=2sjsPQ4UEqDqz3PIBsh8mvfG1mf_5RUcVZGGnUPpacgyzk1mc node index.js
+NGROK_AUTHTOKEN=2sjsPQ4UEqDqz3PIBsh8mvfG1mf_5RUcVZGGnUPpacgyzk1mc node index.js

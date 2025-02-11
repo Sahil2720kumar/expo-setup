@@ -19,7 +19,8 @@ const ProductCategoryTabs = () => {
         <FlatList
           data={categories}
           horizontal
-          contentContainerClassName="gap-7"
+          showsHorizontalScrollIndicator={false}
+          contentContainerClassName="gap-6"
           renderItem={({ item }) => (
             <Pressable className="items-center justify-center gap-1.5">
               {({ pressed }) => (

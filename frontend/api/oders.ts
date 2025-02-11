@@ -1,4 +1,4 @@
-import { Order, InsertOrderItem } from "~/types/order";
+import { Order, InsertOrderItem } from '~/types/order';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -62,8 +62,7 @@ export const getAllOrders = async (sessionToken: string) => {
   }
 };
 
-
-export const getOrderById = async (orderId:number,productId:number,sessionToken: string) => {
+export const getOrderById = async (orderId: number, productId: number, sessionToken: string) => {
   try {
     // console.log('Fetching from:', `${API_URL}/products?page=${page}&pageSize=${pageSize}`);
     const res = await fetch(`${API_URL}/orders/${orderId}/${productId}`, {

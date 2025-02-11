@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { LayoutList } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, FlatList, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
 
@@ -20,13 +20,19 @@ const ProductsScreen = () => {
   // const totalPages = 10; // Example total number of pages
   const { marginAuto, minWidth, iconProductSize: iconSize, noColumns } = useCommonBreakPoints();
 
+  const handleProductsFilters = useCallback((data) => {
+    // console.log('print from produts: ', data);
+    setFilterOptions(data);
+    setCurrentPage(1);
+  }, []);
+
   const {
     data: productsData,
     isPlaceholderData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['products', currentPage,filterOptions],
+    queryKey: ['products', currentPage, filterOptions],
     queryFn: () => getAllProducts(currentPage, 6, filterOptions),
     placeholderData: keepPreviousData,
   });
@@ -65,12 +71,6 @@ const ProductsScreen = () => {
   };
   // const []=useState(products)
 
-  const handleProductsFilters = (data) => {
-    // console.log('print from produts: ', data);
-    setFilterOptions(data);
-    setCurrentPage(1)
-  };
-
   return (
     <ScrollView
       contentContainerStyle={{
@@ -105,24 +105,41 @@ const ProductsScreen = () => {
         </View>
       </View>
       <View className="flex-1 flex-grow">
-        <View className="" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <View className=" w-full  items-center">
-            <FlatList
-              key={noColumns}
-              className="w-full items-start"
-              columnWrapperClassName={`gap-y-2 ${noColumns !== 2 ? 'gap-x-4' : 'gap-x-2'}`}
-              numColumns={noColumns}
-              data={productsData.productsList}
-              renderItem={({ item }) => (
-                <ProductCard
-                  key={item.id}
-                  name={item.name}
-                  description={item.description}
-                  price={item.price}
-                  id={item.id}
-                />
-              )}
-            />
+        <View
+          className=""
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '',
+          }}>
+          <View
+            className=" w-full  items-center justify-center"
+            style={{ justifyContent: 'center' }}>
+            {productsData.productsList.length ? (
+              <FlatList
+                key={noColumns}
+                className="w-full items-center"
+                columnWrapperClassName={`gap-y-2 ${noColumns !== 2 ? 'gap-x-4' : 'gap-x-2'}`}
+                numColumns={noColumns}
+                data={productsData.productsList}
+                renderItem={({ item }) => (
+                  <ProductCard
+                    key={item.id}
+                    name={item.name}
+                    description={item.description}
+                    price={item.price}
+                    id={item.id}
+                  />
+                )}
+              />
+            ) : (
+              <View className=" items-center justify-center" style={{ minHeight: 300 }}>
+                <Text size="lg" className="font-bold">
+                  No Products found {productsData.length}
+                </Text>
+              </View>
+            )}
           </View>
           <View className="pt-[32] md:pt-11  ">
             <Pagination

@@ -1,13 +1,4 @@
-import { throttle } from 'lodash';
-
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  CircleIcon,
-  Filter,
-  Truck,
-} from 'lucide-react-native';
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, Filter } from 'lucide-react-native';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { Button, ButtonText } from './ui/button';
 import { Divider } from './ui/divider';
@@ -22,8 +13,6 @@ import {
   CheckboxIcon,
   CheckboxLabel,
 } from './ui/checkbox';
-import { Slider, SliderTrack, SliderFilledTrack, SliderThumb } from './ui/slider';
-import { Icon } from './ui/icon';
 import { Heading } from './ui/heading';
 import { StatusBar, View } from 'react-native';
 import { useBreakpointValue } from './ui/utils/use-break-point-value';
@@ -76,7 +65,7 @@ const clothPriceRanges = [
   { id: '4', name: 'Over ₹8200', min: 8200, max: Infinity },
 ];
 
-const FilterDrawer = memo(({ handleProductsFilters }) => {
+const FilterDrawer = ({ handleProductsFilters }) => {
   // console.log('re render');
   const [showDrawer, setShowDrawer] = useState(false);
   const iconSize = useBreakpointValue({
@@ -118,7 +107,7 @@ const FilterDrawer = memo(({ handleProductsFilters }) => {
 
   const handleApplyFilter = () => {
     // console.log(filters);
-    handleProductsFilters(filters)
+    handleProductsFilters(filters);
   };
 
   return (
@@ -436,6 +425,6 @@ const FilterDrawer = memo(({ handleProductsFilters }) => {
       </Drawer>
     </>
   );
-});
+};
 
-export default FilterDrawer;
+export default memo(FilterDrawer);

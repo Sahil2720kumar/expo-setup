@@ -20,8 +20,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, ButtonIcon, ButtonText } from './ui/button';
 import { Link, router } from 'expo-router';
 import useAuthStore from '~/store/authStore';
+import { memo } from 'react';
 
-export default function CustomDrawerContent(props: any) {
+function CustomDrawerContent(props: any) {
   // console.log(props.navigation);
   const { top, bottom } = useSafeAreaInsets();
   const { sessionToken, sessionUser, clearSession } = useAuthStore();
@@ -42,17 +43,21 @@ export default function CustomDrawerContent(props: any) {
         <View className="gap-1">
           <View className="items-center">
             <Image
-              source={require('assets/defaultUser.png')}
+              source={
+                sessionUser?.profileImg
+                  ? { uri: sessionUser.profileImg }
+                  : require('assets/defaultUser.png')
+              }
               alt="UserProfileImage"
               className="h-[138] w-[138] rounded-full"
             />
           </View>
           <VStack className="items-center justify-center">
             <Text size="xl" className="text-center">
-              User Name
+              {sessionUser?.name}
             </Text>
             <Text size="lg" className="text-center text-typography-600">
-              abc@gmail.com
+              {sessionUser?.email}
             </Text>
           </VStack>
         </View>
@@ -89,3 +94,5 @@ export default function CustomDrawerContent(props: any) {
     </View>
   );
 }
+
+export default memo(CustomDrawerContent);

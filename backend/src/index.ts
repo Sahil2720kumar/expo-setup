@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth/index.js";
 import ordersRoutes from "./routes/orders/index.js";
 import userRoutes from "./routes/users/index.js";
 import contactRoutes from "./routes/contacts/index.js";
+import paymentRoutes from "./routes/payments/index.js";
 import serverless from "serverless-http";
 
 const app = express();
@@ -31,6 +32,7 @@ app.use("/products", productsRoutes);
 app.use("/auth", authRoutes);
 //orders apis
 app.use("/orders", ordersRoutes);
+app.use("/payments", paymentRoutes);
 //users apis
 app.use("/users", userRoutes);
 app.use("/contact",contactRoutes)

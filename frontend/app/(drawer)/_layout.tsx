@@ -34,7 +34,7 @@ const DrawerLayout = () => {
     <Drawer
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
-        drawerHideStatusBarOnOpen: true,
+        // drawerHideStatusBarOnOpen: true,
         headerTitleAlign: 'center',
         drawerActiveBackgroundColor: '#F1F1F1',
         drawerActiveTintColor: '#000000',

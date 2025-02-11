@@ -8,7 +8,7 @@ import {
 import { db } from "../../db/index.js";
 import _ from "lodash";
 import { ProductType, productsTable } from "../../db/productsSchema.js";
-import { eq, inArray } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 
 export const insertOrder = async (req: Request, res: Response) => {
   try {
@@ -31,7 +31,7 @@ export const insertOrder = async (req: Request, res: Response) => {
       const product = productsList.find((item) => productId === item.id);
       return product ? product.price : null; // Return the price or null if not found
     }
-
+ 
     const totalPrice = data.items.reduce(
       (total: number, product: OrderItemsType) => {
         const productPrice = findProductPrice(product.productId);
@@ -85,6 +85,7 @@ export const listOfOrders = async (req: Request, res: Response) => {
             },
           },
         },
+        orderBy: [desc(ordersTable.id)],
       });
       res.status(200).json(orders);
       return;
@@ -107,6 +108,7 @@ export const listOfOrders = async (req: Request, res: Response) => {
           },
         },
       },
+      orderBy: [desc(ordersTable.id)],
       where: (orders, { eq }) => eq(orders.customerId, req.userId!),
     });
 

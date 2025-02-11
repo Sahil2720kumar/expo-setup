@@ -31,6 +31,19 @@ export const ordersTable = pgTable("orders", {
   paymentMethod: varchar("payment_method", { length: 100 })
     .default("Cash on Delivery")
     .notNull(),
+  // 🔹 Razorpay Order ID (optional, used for online payments)
+  razorpayOrderId: varchar("razorpay_order_id", { length: 255 }),
+
+  // 🔹 Razorpay Payment ID (only if payment is successful)
+  razorpayPaymentId: varchar("razorpay_payment_id", { length: 255 }),
+
+  // 🔹 Razorpay Signature (for verification)
+  razorpaySignature: varchar("razorpay_signature", { length: 255 }),
+
+  // 🔹 Order status (e.g., PAID, PENDING, FAILED)
+  status: varchar("status", { length: 50 }).default("PENDING").notNull(),
+
+  // 🔹 Total amount of the order
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
 });
 

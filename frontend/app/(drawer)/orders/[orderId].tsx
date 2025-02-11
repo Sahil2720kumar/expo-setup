@@ -41,7 +41,7 @@ const OrderProductTrackingScreen = () => {
 
   useEffect(() => {
     const status = orderData?.orderItems?.[0]?.status;
-    switch (status) {
+    switch (status?.toLocaleLowerCase()) {
       case 'pending':
         setCurrentStep(0);
         break;

@@ -2,12 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronRight, Package, Plus } from 'lucide-react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, Platform, TouchableOpacity, View } from 'react-native';
+import RazorpayCheckout from 'react-native-razorpay';
 import { ScrollView } from 'react-native-virtualized-view';
 
 import { getAddresses } from '~/api/addresses';
 import { insertOrder } from '~/api/oders';
+import { createPayment } from '~/api/payments';
 import { Bag } from '~/components/Icons';
 import PaymentSuccess from '~/components/PaymentSuccess';
 import { Button, ButtonIcon, ButtonText } from '~/components/ui/button';
@@ -27,6 +29,7 @@ export default function CheckoutScreen() {
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
   const { sessionUser, sessionToken } = useAuthStore();
   const { products, clearCart } = useCartStore();
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const {
     data: addresses = [],
     isLoading,
@@ -38,23 +41,78 @@ export default function CheckoutScreen() {
 
   const [selectedAddress, setSelectedAddress] = useState<number>(addresses?.[0]?.id || 1);
 
-  const { mutate, isPending } = useMutation({
+  //RAZORPAY CREATE ORDER
+  const { mutate: createRazorpayOrder, isPending: razorpayIsPending } = useMutation({
+    mutationFn: (data: number) => createPayment(data, sessionToken!),
+    onSuccess(data) {
+      console.log('✅ Order Created:', data); // 👈 Order created in backend
+      if (data.razorpayOrderId) {
+        handlePayment(data); // 🛒 Open Razorpay payment UI
+      } else {
+        console.log('Error', 'Failed to get Razorpay Order ID.');
+        // setLoading(false);
+      }
+    },
+    onError(error) {
+      setIsCheckoutLoading(false)
+      console.error('❌ Order Creation Failed', error);
+    },
+  });
+
+  //BACKEND DB CREATE ORDER
+  const { mutate: insertOrderToDb, isPending } = useMutation({
     mutationFn: (data: { order: Pick<Order, 'addressId'>; items: InsertOrderItem[] }) =>
       insertOrder(data, sessionUser?.id!, sessionToken!),
     onSuccess(data) {
+      createRazorpayOrder(data.id);
       console.log('inserted order', data);
-
-      clearCart();
-      client.invalidateQueries({ queryKey: ['orders', sessionUser?.id] });
-      // client.invalidateQueries({ queryKey: ['shippingAddress', addressId] });
-      router.push('/(drawer)/orders');
+      // clearCart();
     },
     onError(error) {
+      setIsCheckoutLoading(false)
       console.log('insert Failed', error);
-      // setIsInvalid(true);
-      // setMutateError(error.message);
     },
   });
+
+  // ✅ Function to initiate Razorpay Payment
+  const handlePayment = async (order) => {
+    try {
+      console.log('🔹 Opening Razorpay Payment Modal...', order);
+      const options = {
+        description: 'Order Payment',
+        image: 'https://yourwebsite.com/logo.png',
+        currency: 'INR',
+        key: 'rzp_test_7gab4oSDkJm8bL', // Replace with Razorpay Key ID
+        amount: order.totalAmount * 100, // Convert to paisa
+        name: 'Dropsquad',
+        order_id: order.razorpayOrderId, // ✅ Razorpay Order ID from backend
+        prefill: {
+          email: sessionUser?.email,
+          contact: sessionUser?.phone,
+          name: sessionUser?.name,
+        },
+        theme: { color: '#F93C00' },
+      };
+
+      // ✅ Open Razorpay Payment Modal
+      const paymentResult = await RazorpayCheckout.open(options);
+
+      if (paymentResult.razorpay_payment_id) {
+        console.log('✅ Payment Success:', paymentResult);
+        // Alert.alert("Success", "Payment successful!");
+        clearCart();
+        client.invalidateQueries({ queryKey: ['orders', sessionUser?.id] });
+        setIsCheckoutLoading(false);
+        router.push('/(drawer)/orders'); // Navigate to orders page
+      } else {
+        // Alert.alert("Payment Failed", "Something went wrong.");
+      }
+    } catch (error) {
+      console.error('❌ Payment Error:', error);
+      setIsCheckoutLoading(false)
+      // Alert.alert("Payment Error", "Transaction failed.");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -71,6 +129,8 @@ export default function CheckoutScreen() {
 
   const onCheckOut = () => {
     // setIsPaymentSuccessful(true);
+    setIsCheckoutLoading(true);
+
     console.log(products);
     const insertedOrderData = {
       addressId: selectedAddress,
@@ -82,7 +142,7 @@ export default function CheckoutScreen() {
       };
     });
     console.log(insertedOrderData, insertedOrderItemsData);
-    mutate({ order: insertedOrderData, items: insertedOrderItemsData });
+    insertOrderToDb({ order: insertedOrderData, items: insertedOrderItemsData });
   };
 
   return (
@@ -186,10 +246,24 @@ export default function CheckoutScreen() {
           <Button
             size="md"
             variant="solid"
+            isDisabled={isCheckoutLoading}
+            disabled={isCheckoutLoading}
             className="h-[48px] rounded-full bg-[#F93C00]"
-            onPress={onCheckOut}>
-            <Bag />
-            <ButtonText className="uppercase">Checkout</ButtonText>
+            onPress={onCheckOut}
+            >
+            {isCheckoutLoading ? (
+              <View className="flex-row gap-3">
+                <ActivityIndicator color={'white'} />
+                <ButtonText size="lg" className="uppercase ">
+                  Loading...
+                </ButtonText>
+              </View>
+            ) : (
+              <>
+                <Bag />
+                <ButtonText className="uppercase">Checkout</ButtonText>
+              </>
+            )}
           </Button>
         </View>
       </View>

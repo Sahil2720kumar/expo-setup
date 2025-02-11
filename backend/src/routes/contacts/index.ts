@@ -1,7 +1,4 @@
 import { Router } from "express";
-import { verifyToken } from "../../middlewares/authMiddleware.js";
-import { validateData } from "../../middlewares/validationMiddleware.js";
-import { verifyAuthorizaion } from "../../middlewares/authorizationMiddleware.js";
 import { upload } from "../../middlewares/multerMiddleware.js";
 import multer from "multer";
 import { Request, Response, NextFunction } from "express";

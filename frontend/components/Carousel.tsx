@@ -33,7 +33,7 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
 
   return (
     <View
-      style={[styles.container, { height: carouselHeight }]}
+      style={[styles.container, { height: carouselHeight,flex:1 }]}
       onLayout={(event) => {
         const { width } = event.nativeEvent.layout;
         setContainerWidth(width);
@@ -62,12 +62,12 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
         ))}
       </View>
       <Button
-        className="bottom-[90] rounded-[30] bg-[#F93C00]"
+        className="bottom-[90] rounded-[30] bg-[#F93C00] "
         style={[styles.button, { display: buttonVisible ? 'flex' : 'none' }]}
         size="xl"
         variant="solid"
         action="primary">
-        <ButtonText>View Collection</ButtonText>
+        <ButtonText className='text-center'>View Collection</ButtonText>
       </Button>
     </View>
   );
@@ -77,7 +77,8 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 10,
     overflow: 'hidden',
-    // backgroundColor:"pink"
+    // flex:1,
+    //  backgroundColor:"red"
   },
   itemContainer: {
     height: '100%', // Match container height
