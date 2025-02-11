@@ -62,7 +62,10 @@ export const orderItemsTable = pgTable("order_items", {
     }),
 
   quantity: integer("quantity").default(1).notNull(),
+
   status: varchar("status", { length: 50 }).default("pending").notNull(),
+  color: varchar("color", { length: 50 }).default(sql`null`),
+  size: varchar("size", { length: 50 }).default("M").notNull(),
   price: doublePrecision().notNull(),
   deliveryDate: date("delivery_date").default(sql`null`),
 });

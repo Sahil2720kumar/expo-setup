@@ -50,6 +50,13 @@
       "when": 1738921190933,
       "tag": "0006_sour_lizard",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1739269891914,
+      "tag": "0007_cute_cammi",
+      "breakpoints": true
     }
   ]
 }
