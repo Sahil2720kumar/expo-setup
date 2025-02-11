@@ -13,7 +13,7 @@ const Carousel = ({ data, buttonVisible, height: carouselHeight }) => {
 
   const renderItem = ({ item }) => (
     <View style={[styles.itemContainer, { width: containerWidth }]}>
-      <Image resizeMode="cover" source={clothImage} style={styles.image} />
+      <Image resizeMode="cover" source={item?.image?{uri:item?.image}:clothImage} style={styles.image} />
 
       <Text size="xl" style={styles.title}>
         LACOSTE

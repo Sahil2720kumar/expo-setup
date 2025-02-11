@@ -157,10 +157,8 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    req.cleanBody = _.pick(
-      { ...req.body },
-      Object.keys(updateUserSchema.shape)
-    );
+    console.log(req.cleanBody);
+       
     const { userId } = req.params;
     let updatedFields = req.cleanBody;
     const {oldPassword}={...req.body}

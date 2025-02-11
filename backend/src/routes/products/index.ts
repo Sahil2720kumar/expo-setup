@@ -1,39 +1,65 @@
-import { Router } from "express"
-import { deleteProduct, getProductById, insertProduct, listOfProducts, updateProduct } from "./productsController.js"
-import { validateData } from "../../middlewares/validationMiddleware.js"
-import { insertProductSchema, updateProductSchema } from "../../db/productsSchema.js";
-import {verifyToken} from "../../middlewares/authMiddleware.js"
+import { Router } from "express";
+import { Request, Response, NextFunction } from "express";
+import {
+  deleteProduct,
+  getProductById,
+  insertProduct,
+  listOfProducts,
+  updateProduct,
+  updateProductImages,
+} from "./productsController.js";
+import { validateData } from "../../middlewares/validationMiddleware.js";
+import {
+  insertProductSchema,
+  updateProductSchema,
+} from "../../db/productsSchema.js";
+import { verifyToken } from "../../middlewares/authMiddleware.js";
 import { verifyAuthorizaion } from "../../middlewares/authorizationMiddleware.js";
+import { upload } from "../../middlewares/multerMiddleware.js";
+import multer from "multer";
 
-// Using Zod schema
+// Middleware to handle multer errors
+const uploadMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  upload.array("productImgs")(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      // Handle Multer-specific errors (e.g., file size exceeded)
+      return res.status(400).json({ message: err.message });
+    } else if (err) {
+      // Handle general errors (e.g., invalid file type)
+      return res.status(400).json({ message: err.message });
+    }
+    next();
+  });
+};
 
-// export const insertProductSchema = z.object({
-//     // id: z.number().int(), // Auto-generated primary key
-//     category: z.string().max(255), // String with max length of 255
-//     subcategory: z.string().max(255), // String with max length of 255
-//     name: z.string().max(255), // String with max length of 255
-//     description: z.string(), // Text field
-//     price: z.number().nonnegative().refine(val => val.toFixed(2) === val.toFixed(2)), // Numeric with precision 10, scale 2
-//     size: z.array(z.string()), // Array of sizes, e.g., ["S", "M", "L", "XL"]
-//     color: z.array(z.string()), // Array of colors, e.g., ["White", "Black", "Blue"]
-//     inStock: z.boolean(), // Boolean value
-//     images: z.array(z.string()), // Array of image file names
-//     rating: z.number().min(0).max(5), // Floating-point rating between 0 and 5
-//   });
+const router = Router();
 
-//const insertProductSchema=createInsertSchema(products)
+router.get("/", listOfProducts);
+router.get("/:id", getProductById);
+router.post(
+  "/",
+  verifyToken,
+  verifyAuthorizaion,
+  
+  validateData(insertProductSchema),
+  insertProduct
+);
 
+router.put(
+  "/upload/:id",
+  verifyToken,
+  verifyAuthorizaion,
+  uploadMiddleware,
+  updateProductImages
+);
 
-
-//type ProductType = z.TypeOf<typeof insertProductSchema>;
-
- 
-const router=Router()
-
-router.get("/",listOfProducts)
-router.get("/:id",getProductById)
-router.post("/",verifyToken,verifyAuthorizaion,validateData(insertProductSchema),insertProduct)
-router.put("/:id",verifyToken,verifyAuthorizaion,validateData(updateProductSchema),updateProduct)
-router.delete("/:id",verifyToken,verifyAuthorizaion,deleteProduct) 
+router.put(
+  "/:id",
+  verifyToken,
+  verifyAuthorizaion,
+  validateData(updateProductSchema),
+  updateProduct
+);
+router.delete("/:id", verifyToken, verifyAuthorizaion, deleteProduct);
 
 export default router;

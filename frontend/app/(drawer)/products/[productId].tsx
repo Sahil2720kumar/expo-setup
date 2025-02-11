@@ -33,7 +33,7 @@ const ProductDetailsScreen = () => {
   const [selectedColor, setSelectedColor] = useState('393944');
   const [selectedSize, setSelectedSize] = useState('S');
   const { addProduct, products } = useCartStore();
-  const {sessionUser,sessionToken}=useAuthStore()
+  const { sessionUser, sessionToken } = useAuthStore();
   const isAlreadyInCart = products.find((product) => product.id === Number(productId));
   // console.log('productID', productId);
   // console.log('isAlreadyInvar', isAlreadyInCart);
@@ -46,14 +46,6 @@ const ProductDetailsScreen = () => {
     { id: 4, icon: DoNotDryTumble, description: 'Do not tumble dry' },
   ];
 
-  const carouselData = useMemo(
-    () => [
-      { id: 1, title: 'Item 1', image: 'https://via.placeholder.com/300x200?text=Item+1' },
-      { id: 2, title: 'Item 2', image: 'https://via.placeholder.com/300x200?text=Item+2' },
-      { id: 3, title: 'Item 3', image: 'https://via.placeholder.com/300x200?text=Item+3' },
-    ],
-    []
-  ); // Empty dependency array means it will only be created once
   const {
     data: productData,
     isLoading,
@@ -63,9 +55,21 @@ const ProductDetailsScreen = () => {
     queryFn: () => getProductById(Number(productId)),
   });
 
+  const carouselData = useMemo(
+    () =>
+      productData?.images?.map((image, index) => {
+        return {
+          id: index + 1,
+          image: image,
+        };
+      }),
+    [productData]
+  ); // Empty dependency array means it will only be created once
+  console.log("datat",carouselData);
+
   const addToCart = () => {
-    if(!sessionUser || !sessionToken){
-      router.push("/(drawer)/(auth)/signIn")
+    if (!sessionUser || !sessionToken) {
+      router.push('/(drawer)/(auth)/signIn');
     }
     addProduct(productData!);
   };
@@ -136,7 +140,9 @@ const ProductDetailsScreen = () => {
           {/* BASIS PRODUCT INFORMATION */}
           <View className="mt-4 h-[100] flex-row items-center justify-between">
             <View className="flex-1 gap-0.5">
-              <Text className="w-full text-2xl font-bold text-black">{productData?.name}  id #{productData?.id}</Text>
+              <Text className="w-full text-2xl font-bold text-black">
+                {productData?.name} id #{productData?.id}
+              </Text>
               <Text
                 numberOfLines={2}
                 ellipsizeMode="tail"
@@ -155,12 +161,14 @@ const ProductDetailsScreen = () => {
           </View>
 
           {/* COLOR AND SIZE SECTION */}
-          <View className="flex flex-row gap-3 items-center justify-between" style={{marginTop:18}}>
-            <View className="flex-row gap-2 flex-1" >
+          <View
+            className="flex flex-row items-center justify-between gap-3"
+            style={{ marginTop: 18 }}>
+            <View className="flex-1 flex-row gap-2">
               <Text className="text-[#888888]">Color</Text>
               {productData?.color.map((color) => (
                 <TouchableOpacity
-                key={color}
+                  key={color}
                   activeOpacity={0.7}
                   className=" h-[26] w-[26] rounded-[12]  border-2 border-[#888888] p-0.5">
                   <View
@@ -170,10 +178,12 @@ const ProductDetailsScreen = () => {
                 </TouchableOpacity>
               ))}
             </View>
-            <View className="flex-row items-center justify-between gap-2 flex-wrap ">
+            <View className="flex-row flex-wrap items-center justify-between gap-2 ">
               <Text className="text-[#888888]">Size</Text>
-              {productData?.size.map((size,index) => (
-                <View key={index} className="h-[26] w-[26] items-center justify-center rounded-[13] bg-[#F93C00]">
+              {productData?.size.map((size, index) => (
+                <View
+                  key={index}
+                  className="h-[26] w-[26] items-center justify-center rounded-[13] bg-[#F93C00]">
                   <Text className="font-semibold text-white">{size}</Text>
                 </View>
               ))}

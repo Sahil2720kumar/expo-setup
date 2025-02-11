@@ -3,9 +3,10 @@ import { db } from "../../db/index.js";
 import { insertProductSchema, productsTable } from "../../db/productsSchema.js";
 import { between, count, desc, eq, inArray } from "drizzle-orm";
 import _ from "lodash";
-import { and, gte, lte, ilike, sql, contains } from "drizzle-orm";
+import { and, gte, lte, ilike, sql} from "drizzle-orm";
+import { uploadOnCloudinary } from "../../../utils/cloudinary.js"
 
-const listOfProducts = async (req, res) => {
+const listOfProducts = async (req:Request, res:Response) => {
   try {
     const { page = 1, pageSize = 6 } = req.query;
 
@@ -34,7 +35,7 @@ const listOfProducts = async (req, res) => {
     const conditions: string | any[] = [];
 
     if (colors.length) {
-      colors.forEach(color => {
+      colors.forEach((color) => {
         conditions.push(
           sql`EXISTS (
             SELECT 1 FROM jsonb_array_elements_text(${productsTable.color}::jsonb) AS elem
@@ -45,7 +46,7 @@ const listOfProducts = async (req, res) => {
     }
 
     if (sizes.length) {
-      sizes.forEach(size => {
+      sizes.forEach((size) => {
         conditions.push(
           sql`EXISTS (
             SELECT 1 FROM jsonb_array_elements_text(${productsTable.size}::jsonb) AS size_elem
@@ -57,39 +58,48 @@ const listOfProducts = async (req, res) => {
 
     if (genderAndAgeCategories.length) {
       conditions.push(
-        sql`LOWER(${productsTable.category}) = ANY(ARRAY[${sql.join(genderAndAgeCategories.map(cat => sql`${cat.toLowerCase()}`), sql`, `)}]::text[])`
+        sql`LOWER(${productsTable.category}) = ANY(ARRAY[${sql.join(
+          genderAndAgeCategories.map((cat) => sql`${cat.toLowerCase()}`),
+          sql`, `
+        )}]::text[])`
       );
     }
 
     if (categories.length) {
       conditions.push(
         sql`LOWER(${productsTable.subcategory}) = ANY(
-          ARRAY[${sql.join(categories.map(cat => sql`${cat.toLowerCase()}`), sql`, `)}]::text[]
+          ARRAY[${sql.join(
+            categories.map((cat) => sql`${cat.toLowerCase()}`),
+            sql`, `
+          )}]::text[]
         )`
       );
     }
-    
+
     if (brands.length) {
       conditions.push(
         sql`LOWER(${productsTable.brand}) = ANY(
-          ARRAY[${sql.join(brands.map(brand => sql`${brand.toLowerCase()}`), sql`, `)}]::text[]
+          ARRAY[${sql.join(
+            brands.map((brand) => sql`${brand.toLowerCase()}`),
+            sql`, `
+          )}]::text[]
         )`
       );
     }
 
-
-
     if (priceRange.length) {
-      console.log("price range",priceRange);
-      
-      console.log(priceRange[0].split("-")[0], // min price
-      priceRange[0].split("-")[0])
-      
+      console.log("price range", priceRange);
+
+      console.log(
+        priceRange[0].split("-")[0], // min price
+        priceRange[0].split("-")[0]
+      );
+
       conditions.push(
         between(
           productsTable.price,
           Number(priceRange[0].split("-")[0]), // min price
-          Number(priceRange[0].split("-")[1])// max price
+          Number(priceRange[0].split("-")[1]) // max price
         )
       );
     }
@@ -136,7 +146,11 @@ const getProductById = async (req: Request, res: Response) => {
 
 const insertProduct = async (req: Request, res: Response) => {
   try {
-    // console.log(req.userId)
+    req.cleanBody = _.pick(
+      { ...req.body },
+      Object.keys(insertProductSchema.shape)
+    );
+
     const [newInsertedProduct] = await db
       .insert(productsTable)
       .values(req.cleanBody)
@@ -200,10 +214,48 @@ const deleteProduct = async (req: Request, res: Response) => {
   }
 };
 
+const updateProductImages = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const updatedFields = req.cleanBody;
+
+    // Upload images to Cloudinary in parallel
+    const productImgs = await Promise.all(
+      req.files ? req.files.map((file) => uploadOnCloudinary(file.path || "")) : []
+    );
+
+    // Update product in the database
+    const [product] = await db
+      .update(productsTable)
+      .set({ images: productImgs }) // Ensure 'images' field matches your DB schema
+      .where(eq(productsTable.id, id))
+      .returning();
+
+    if (!product) {
+      res.status(404).json({ message: "Product not found", status: 404 });
+      return
+    }
+
+    res.status(200).json({
+      message: "Product updated successfully",
+      status: 200, // Changed from 204 to 200
+      product,
+    });
+
+  } catch (err) {
+    console.error("Error updating product:", err);
+    res.status(500).json({ message: "Failed to update product", status: 500 });
+  }
+};
+
+
+
+
 export {
   listOfProducts,
   getProductById,
   insertProduct,
   updateProduct,
   deleteProduct,
+  updateProductImages
 };

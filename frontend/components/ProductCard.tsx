@@ -8,7 +8,8 @@ export default function ProductCard({
   rating = '',
   price = '',
   id = 1,
-}) {
+  images
+}) {  
   return (
     <Link href={`/(drawer)/products/${id}`} asChild>
       <TouchableOpacity
@@ -19,7 +20,7 @@ export default function ProductCard({
           <Image
             resizeMode="cover"
             className="flex-1 rounded-lg"
-            source={require('./../assets/shirt.png')}
+            source={images?.[0]?{uri:images?.[0]}:require('./../assets/shirt.png')}
           />
         </View>
         <View className="mt-1.5">

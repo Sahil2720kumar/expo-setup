@@ -71,6 +71,9 @@ const ProductsScreen = () => {
   };
   // const []=useState(products)
 
+
+  console.log(productsData);
+  
   return (
     <ScrollView
       contentContainerStyle={{
@@ -130,6 +133,7 @@ const ProductsScreen = () => {
                     description={item.description}
                     price={item.price}
                     id={item.id}
+                    images={item.images}
                   />
                 )}
               />

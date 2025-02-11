@@ -1,4 +1,5 @@
 import express, { json, urlencoded } from "express";
+import bodyParser from "body-parser";
 import cors from "cors"
 import multer from "multer"
 import * as fs from 'fs';
@@ -18,7 +19,7 @@ app.use(cors())
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(express.static("public"))
- 
+// app.use(bodyParser.json())
 
 // Create uploads directory if it doesn't exist
 const dir = './public/uploads';
