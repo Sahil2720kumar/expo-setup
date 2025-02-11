@@ -25,6 +25,8 @@ interface OrderItem {
   orderId: number;
   productId: number;
   quantity: number;
+  size:string,
+  color:string,
   status: string;
   price: number;
   deliveryDate: null;

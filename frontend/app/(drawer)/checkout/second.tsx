@@ -139,6 +139,8 @@ export default function CheckoutScreen() {
       return {
         productId: product?.id,
         quantity: product.quantity,
+        color:product.productColor,
+        size:product.productSize
       };
     });
     console.log(insertedOrderData, insertedOrderItemsData);

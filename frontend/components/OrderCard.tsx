@@ -41,8 +41,8 @@ const OrderCard = ({ order }: { order: DisplayOrder }) => (
             <View className="ml-4 flex-1">
               <Text className="font-medium text-gray-900">{item.product.name}</Text>
               <Text className="mt-0 text-gray-500">{item.product.description}</Text>
-              <Text className="mt-1 text-gray-900">price: {item.price}</Text>
-              <Text className="text-gray-500 ">Qty: {item.quantity}</Text>
+              <Text className="mt-1 text-gray-900">price: {item.price}  </Text>
+              <Text className="text-gray-500 ">Qty: {item.quantity} size: {item.size} color: {item.color} </Text>
             </View>
           </View>
 

@@ -8,10 +8,12 @@ import { Product } from '~/types';
 import useCartStore from '~/store/cartStore';
 
 type CartItemProps = {
-  item: Product & { quantity: number };
+  item: Product & { quantity: number; productColor?: string; productSize?: string };
 };
 
 const CartItem = ({ item }: CartItemProps) => {
+  console.log('cartItem', item);
+
   const { addProduct, reduceProduct } = useCartStore();
   return (
     <View className=" w-full flex-row gap-3" style={{ aspectRatio: 1 / 0.4 }}>
@@ -21,7 +23,7 @@ const CartItem = ({ item }: CartItemProps) => {
           size="full"
           style={{ width: '100%', height: '100%' }}
           className="rounded-[5]"
-          source={require('./../assets/cloth.png')}
+          source={item.images ? { uri: item.images[0] } : require('./../assets/cloth.png')}
           alt="ProductImage"
         />
       </View>
@@ -31,6 +33,8 @@ const CartItem = ({ item }: CartItemProps) => {
             {item.name}
           </Text>
           <Text className="text-[#888888]">{item.description}</Text>
+          <Text className="text-[#888888]">Color: {item.productColor}</Text>
+          <Text className="text-[#888888]">Size: {item.productSize}</Text>
         </View>
         <View className="w-full flex-row items-center justify-between pb-1 ">
           <View className="flex-row items-center gap-2">

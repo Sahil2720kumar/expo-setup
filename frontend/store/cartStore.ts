@@ -1,11 +1,11 @@
-import { create } from "zustand";
-import { Product } from "~/types";
+import { create } from 'zustand';
+import { Product } from '~/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createJSONStorage, persist } from "zustand/middleware";
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface CartState {
-  products: Array<Product & { quantity: number }>;
-  addProduct: (product: Product) => void;
+  products: Array<Product & { quantity: number; productColor?: string; productSize?: string }>;
+  addProduct: (product: Product, selectedSize: string, selectedColor: string) => void;
   reduceProduct: (product: Product) => void;
   clearCart: () => void;
   items: number;
@@ -19,23 +19,25 @@ const useCartStore = create<CartState>()(
       items: 0,
       totalPrice: 0,
 
-      addProduct: (product: Product) => {
+      addProduct: (product: Product, selectedSize: string, selectedColor: string) => {
         const { products, items, totalPrice } = get();
         const existingProduct = products.find((p) => p.id === product.id);
+        console.log('from cartstoe', selectedSize, selectedColor);
 
         if (existingProduct) {
           set({
             products: products.map((p) =>
-              p.id === product.id
-                ? { ...p, quantity: p.quantity + 1 }
-                : p
+              p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
             ),
             items: items + 1,
             totalPrice: totalPrice + product.price,
           });
         } else {
           set({
-            products: [...products, { ...product, quantity: 1 }],
+            products: [
+              ...products,
+              { ...product, quantity: 1, productColor: selectedColor, productSize: selectedSize },
+            ],
             items: items + 1,
             totalPrice: totalPrice + product.price,
           });
@@ -50,9 +52,7 @@ const useCartStore = create<CartState>()(
           if (existingProduct.quantity > 1) {
             set({
               products: products.map((p) =>
-                p.id === product.id
-                  ? { ...p, quantity: p.quantity - 1 }
-                  : p
+                p.id === product.id ? { ...p, quantity: p.quantity - 1 } : p
               ),
               items: items - 1,
               totalPrice: totalPrice - product.price,

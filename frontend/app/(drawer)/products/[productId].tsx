@@ -1,5 +1,5 @@
 import { ActivityIndicator, FlatList, Pressable, TouchableOpacity, View } from 'react-native';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView } from 'react-native-virtualized-view';
 import { Text } from '~/components/ui/text';
 import { ChevronLeft, Heart, Share2 } from 'lucide-react-native';
@@ -30,8 +30,6 @@ const ProductDetailsScreen = () => {
   //hooks
   const { marginAuto } = useCommonBreakPoints();
   const router = useRouter();
-  const [selectedColor, setSelectedColor] = useState('393944');
-  const [selectedSize, setSelectedSize] = useState('S');
   const { addProduct, products } = useCartStore();
   const { sessionUser, sessionToken } = useAuthStore();
   const isAlreadyInCart = products.find((product) => product.id === Number(productId));
@@ -55,6 +53,17 @@ const ProductDetailsScreen = () => {
     queryFn: () => getProductById(Number(productId)),
   });
 
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
+  const [selectedSize, setSelectedSize] = useState('S');
+  
+  useEffect(() => {
+    if (productData?.color?.length > 0) {
+      setSelectedColor(productData.color[0]); // Set the first available color when data is loaded
+      setSelectedSize(productData?.size[1])
+    }
+  }, [productData]); // Runs when `productData` changes
+
+
   const carouselData = useMemo(
     () =>
       productData?.images?.map((image, index) => {
@@ -70,8 +79,8 @@ const ProductDetailsScreen = () => {
   const addToCart = () => {
     if (!sessionUser || !sessionToken) {
       router.push('/(drawer)/(auth)/signIn');
-    }
-    addProduct(productData!);
+    }    
+     addProduct(productData!,selectedSize,selectedColor!);
   };
 
   if (isLoading) {
@@ -149,6 +158,12 @@ const ProductDetailsScreen = () => {
                 className="text-md w-full text-[#888888]">
                 {productData?.description}
               </Text>
+              {/* <Text
+                numberOfLines={2}
+                ellipsizeMode="tail"
+                className="text-md w-full text-[#888888]">
+                For {productData?.category}
+              </Text> */}
               <Text className="w-full text-xl font-bold text-[#F93C00]">{productData?.price}</Text>
             </View>
             <TouchableOpacity
@@ -170,7 +185,8 @@ const ProductDetailsScreen = () => {
                 <TouchableOpacity
                   key={color}
                   activeOpacity={0.7}
-                  className=" h-[26] w-[26] rounded-[12]  border-2 border-[#888888] p-0.5">
+                  onPress={()=>setSelectedColor(color)}
+                  className={`h-[26] w-[26] rounded-[12] ${selectedColor===color?" border-2 border-[#888888]":""} p-0.5 `}>
                   <View
                     className="flex-1 rounded-[10]"
                     style={{ backgroundColor: color.toLowerCase() }}
@@ -181,11 +197,15 @@ const ProductDetailsScreen = () => {
             <View className="flex-row flex-wrap items-center justify-between gap-2 ">
               <Text className="text-[#888888]">Size</Text>
               {productData?.size.map((size, index) => (
-                <View
+                <TouchableOpacity
                   key={index}
-                  className="h-[26] w-[26] items-center justify-center rounded-[13] bg-[#F93C00]">
-                  <Text className="font-semibold text-white">{size}</Text>
-                </View>
+                  activeOpacity={0.7}
+                  onPress={()=>setSelectedSize(size)}
+                  className={`h-[28] w-[28] items-center justify-center rounded-[13] items-center jus ${selectedSize===size?"bg-[#F93C00]":" border-2 border-[#F1F1F1]"}`}
+                  // className="h-[28] w-[28] bg-slate-700"
+                  >
+                  <Text className={`font-semibold  ${selectedSize===size?"text-white":" text-[#888888]"}`}>{size}</Text>
+                </TouchableOpacity>
               ))}
             </View>
           </View>
