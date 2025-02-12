@@ -8,7 +8,7 @@ import { HeaderButton } from '../../components/HeaderButton';
 
 import CustomDrawerContent from '~/components/CustomDrawerContent';
 import { Icon } from '~/components/ui/icon';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Badge, BadgeText } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { VStack } from '~/components/ui/vstack';
@@ -23,13 +23,14 @@ const DrawerLayout = () => {
   const protectedRoutes = ['checkout', 'orders', 'setting', 'shippingAddress'];
   const isProtectedRoute = protectedRoutes.includes(segments[1]!);
   // console.log(isProtectedRoute, segments[1]);
-  
+
   useEffect(() => {
     if (!sessionUser && !sessionToken && isProtectedRoute) {
       router.replace('/(drawer)/(auth)/signIn');
     }
   }, [sessionUser, sessionToken, isProtectedRoute, router]);
 
+  const [search, setSearch] = useState<string>();
   return (
     <Drawer
       drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -55,6 +56,7 @@ const DrawerLayout = () => {
             <Link href="/cart" asChild>
               <HeaderButton iconName="search" />
             </Link>
+
             <Link href="/cart" asChild>
               <VStack className="relative mr-4">
                 <Badge
@@ -80,6 +82,18 @@ const DrawerLayout = () => {
         options={{
           headerTitle: 'DropSquad',
           drawerLabel: 'Home',
+          drawerIcon: ({ size, color }) => (
+            <Icon as={HomeIcon} size="xl" className="text-typography-600" color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="search"
+        options={{
+          headerTitle: 'DropSquad',
+          drawerLabel: 'Search',
+          headerShown: false,
+          // drawerItemStyle: { display: 'none' },
           drawerIcon: ({ size, color }) => (
             <Icon as={HomeIcon} size="xl" className="text-typography-600" color={color} />
           ),
@@ -119,7 +133,7 @@ const DrawerLayout = () => {
         listeners={({ navigation }) => ({
           drawerItemPress: () => {
             // navigation.navigate('products'); // Navigate without parameters
-            router.push("/(drawer)/products")
+            router.push('/(drawer)/products');
           },
         })}
       />

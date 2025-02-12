@@ -98,7 +98,7 @@ export default function Home() {
             </View>
           ) : (
             <FlatList
-              data={productsSliderData.productsList}
+              data={productsSliderData?.productsList}
               renderItem={({ item }) => (
                 <ProductSliderCard item={item} width={207} height={304} imageHeight={'81%'} />
               )}

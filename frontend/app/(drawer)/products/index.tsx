@@ -16,13 +16,15 @@ import { useCommonBreakPoints } from '~/utils/breakPoints';
 import { useLocalSearchParams } from 'expo-router';
 
 const ProductsScreen = () => {
-  const { category } = useLocalSearchParams();
-  console.log(category);
+  const { category,q } = useLocalSearchParams();
+  console.log(category,q);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [filterOptions, setFilterOptions] = useState(null);
   // const totalPages = 10; // Example total number of pages
   const { marginAuto, minWidth, iconProductSize: iconSize, noColumns } = useCommonBreakPoints();
+  const [searchQuery,setSearchQuery]=useState();
+const [isSearchQueryExist,setIsSearchQueryExist]=useState(false)
 
   const handleProductsFilters = useCallback((data) => {
     // console.log('print from produts: ', data);
@@ -36,7 +38,11 @@ const ProductsScreen = () => {
         genderAndAgeCategories: [category],
       });
     }
-  }, [category]);
+    if(q){
+      setSearchQuery(q)
+      setIsSearchQueryExist(true)
+    }
+  }, [category,q]);
 
   const {
     data: productsData,
@@ -44,8 +50,8 @@ const ProductsScreen = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['products', currentPage, filterOptions],
-    queryFn: () => getAllProducts(currentPage, 6, filterOptions),
+    queryKey: ['products', currentPage, filterOptions,searchQuery],
+    queryFn: () => getAllProducts(currentPage, 6, filterOptions,searchQuery),
     placeholderData: keepPreviousData,
   });
 

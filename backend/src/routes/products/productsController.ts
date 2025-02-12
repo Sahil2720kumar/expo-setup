@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 import { db } from "../../db/index.js";
 import { insertProductSchema, productsTable } from "../../db/productsSchema.js";
-import { between, count, desc, eq, inArray } from "drizzle-orm";
+import { between, count, desc, eq, inArray, or } from "drizzle-orm";
 import _ from "lodash";
-import { and, gte, lte, ilike, sql} from "drizzle-orm";
-import { uploadOnCloudinary } from "../../../utils/cloudinary.js"
+import { and, gte, lte, ilike, sql } from "drizzle-orm";
+import { uploadOnCloudinary } from "../../../utils/cloudinary.js";
 
-const listOfProducts = async (req:Request, res:Response) => {
+const listOfProducts = async (req: Request, res: Response) => {
   try {
-    const { page = 1, pageSize = 6 } = req.query;
+    const { page = 1, pageSize = 6, q } = req.query;
+    // console.log(q);
 
     const categories = req.query.categories
       ? JSON.parse(req.query.categories)
@@ -104,16 +105,45 @@ const listOfProducts = async (req:Request, res:Response) => {
       );
     }
 
+    // let productsList
     const productsList = await db.query.productsTable.findMany({
-      where: conditions.length ? and(...conditions) : undefined,
+      where: conditions.length
+        ? and(...conditions)
+        : q
+        ? or(
+            q ? ilike(productsTable.name, `%${q}%`) : undefined,
+            q ? ilike(productsTable.category, `%${q}%`) : undefined,
+            q ? ilike(productsTable.subcategory, `%${q}%`) : undefined,
+            q ? ilike(productsTable.description, `%${q}%`) : undefined,
+            q ? ilike(productsTable.materials, `%${q}%`) : undefined
+          )
+        : undefined,
       orderBy: (products, { desc }) => desc(products.id),
       limit: Number(pageSize),
       offset: (Number(page) - 1) * Number(pageSize),
+      // columns:{
+      //   id:true,
+      //   name:true
+      // }
     });
 
     const totalProductsCount = await db
       .select({ count: count() })
-      .from(productsTable);
+      .from(productsTable)
+      .where(
+        conditions.length
+          ? and(...conditions)
+          : q
+          ? or(
+              ilike(productsTable.name, `%${q}%`),
+              ilike(productsTable.category, `%${q}%`),
+              ilike(productsTable.subcategory, `%${q}%`),
+              ilike(productsTable.description, `%${q}%`),
+              ilike(productsTable.materials, `%${q}%`)
+            )
+          : undefined
+      );
+
     // console.log(productsList);
 
     res.status(200).json({
@@ -221,7 +251,9 @@ const updateProductImages = async (req: Request, res: Response) => {
 
     // Upload images to Cloudinary in parallel
     const productImgs = await Promise.all(
-      req.files ? req.files.map((file) => uploadOnCloudinary(file.path || "")) : []
+      req.files
+        ? req.files.map((file) => uploadOnCloudinary(file.path || ""))
+        : []
     );
 
     // Update product in the database
@@ -233,7 +265,7 @@ const updateProductImages = async (req: Request, res: Response) => {
 
     if (!product) {
       res.status(404).json({ message: "Product not found", status: 404 });
-      return
+      return;
     }
 
     res.status(200).json({
@@ -241,15 +273,11 @@ const updateProductImages = async (req: Request, res: Response) => {
       status: 200, // Changed from 204 to 200
       product,
     });
-
   } catch (err) {
     console.error("Error updating product:", err);
     res.status(500).json({ message: "Failed to update product", status: 500 });
   }
 };
-
-
-
 
 export {
   listOfProducts,
@@ -257,5 +285,5 @@ export {
   insertProduct,
   updateProduct,
   deleteProduct,
-  updateProductImages
+  updateProductImages,
 };

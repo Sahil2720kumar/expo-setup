@@ -1,12 +1,16 @@
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export const getAllProducts = async (page = 1, pageSize = 6, filterOptions = {}) => {
+export const getAllProducts = async (page = 1, pageSize = 6, filterOptions = {},searchQuery) => {
   try {
     // Initialize query parameters with pagination
+
+
     const queryParams = new URLSearchParams({
       page: page.toString(),
       pageSize: pageSize.toString(),
-    });    
+      q:searchQuery?searchQuery?.replace(/%20/g, '+').trim().toString():''
+    });
+
 
     // Append filter options if they exist
     if (filterOptions) {
