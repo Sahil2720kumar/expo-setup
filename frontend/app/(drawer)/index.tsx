@@ -91,6 +91,7 @@ export default function Home() {
             <View
               style={{
                 height: '100%',
+                minHeight:400,
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>

@@ -48,6 +48,20 @@
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.anonymous.dropsquad"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "897ccaf9-70f5-42a0-8a58-7b4fd3ac382a"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/897ccaf9-70f5-42a0-8a58-7b4fd3ac382a"
     }
   }
 }

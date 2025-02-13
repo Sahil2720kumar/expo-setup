@@ -175,7 +175,7 @@ const ProductDetailsScreen = () => {
           <View className="mt-4 h-[100] flex-row items-center justify-between">
             <View className="flex-1 gap-0.5">
               <Text className="w-full text-2xl font-bold text-black">
-                {productData?.name} id #{productData?.id}
+                {productData?.name}
               </Text>
               <Text
                 numberOfLines={2}
@@ -295,6 +295,7 @@ const ProductDetailsScreen = () => {
                 <View
                   style={{
                     height: '100%',
+                    minHeight:400,
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}>

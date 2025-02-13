@@ -49,7 +49,7 @@ export default function SearchInterface() {
               returnKeyType="search" // Makes keyboard return key a search button
             />
             <InputSlot className="pl-3">
-              <X size={24} onPress={() => setSearchQuery('')} />
+              <X  size={24} onPress={() => router.push("/(drawer)")} />
             </InputSlot>
           </Input>
         </Box>

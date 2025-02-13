@@ -53,7 +53,7 @@ const DrawerLayout = () => {
         },
         headerRight: () => (
           <>
-            <Link href="/cart" asChild>
+            <Link href="/search" asChild>
               <HeaderButton iconName="search" />
             </Link>
 
@@ -93,7 +93,7 @@ const DrawerLayout = () => {
           headerTitle: 'DropSquad',
           drawerLabel: 'Search',
           headerShown: false,
-          // drawerItemStyle: { display: 'none' },
+          drawerItemStyle: { display: 'none' },
           drawerIcon: ({ size, color }) => (
             <Icon as={HomeIcon} size="xl" className="text-typography-600" color={color} />
           ),
