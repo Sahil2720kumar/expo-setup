@@ -43,7 +43,7 @@ export const getAllProducts = async (page = 1, pageSize = 6, filterOptions = {},
     }
 
     const data = await res.json();
-    console.log('Fetched data:', data);
+    // console.log('Fetched data:', data);
     return data;
   } catch (error) {
     console.error('Fetch failed:', error);

@@ -69,8 +69,8 @@ export default function Home() {
       }}
       showsVerticalScrollIndicator={false}>
       {/* CAROUSEL SECTION */}
-      <View style={{ flex: 1, minHeight: 600, maxHeight: 700 }}>
-        <Carousel isClickable={true} data={carouselData} buttonVisible={true} height={700} />
+      <View style={{ flex: 1, minHeight: 600, maxHeight: 740 }}>
+        <Carousel isClickable={true} data={carouselData} buttonVisible={true} height={600} />
       </View>
 
       {/* PRODUCT CATEGORY TABS */}
@@ -82,7 +82,7 @@ export default function Home() {
       </View> */}
 
       {/* JUST FOR CUSTOMERS SECTION  */}
-      <View style={{ marginTop: 40, height: calculatedHeight, maxHeight: 700 }}>
+      <View style={{ marginTop: 40, height: 600, maxHeight: 700 }}>
         <Text size="2xl" style={{ textAlign: 'center', fontWeight: '600', color: 'black' }}>
           JUST FOR YOU
         </Text>

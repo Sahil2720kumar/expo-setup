@@ -12,7 +12,7 @@ type CartItemProps = {
 };
 
 const CartItem = ({ item }: CartItemProps) => {
-  console.log('cartItem', item);
+  // console.log('cartItem', item);
 
   const { addProduct, reduceProduct } = useCartStore();
   return (

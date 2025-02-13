@@ -1,6 +1,5 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response} from "express";
 import { db } from "../../db";
-import { productsTable } from "../../db/productsSchema";
 import { eq } from "drizzle-orm";
 import razorpay from "../../../config/razorpay.config";
 import crypto from "crypto";
@@ -27,11 +26,13 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
 
     // Convert amount to paise (Razorpay uses the smallest currency unit)
     const options = {
-      amount: Number(order.totalAmount) * 100, //amount in smallest currency unit
+      amount: Math.floor(Number(order.totalAmount))* 100, //amount in smallest currency unit
       currency: "INR",
       // reciept: `order_rcpt_${Date.now()}`,
     };
-
+    
+    console.log(options);
+    
     // Create order in Razorpay
     const razorpayOrder = await razorpay.orders.create(options);
     console.log(razorpayOrder);
@@ -48,8 +49,8 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
       message: "Razorpay order created successfully",
       status: 200,
       success: true,
-      razorpayOrderId:razorpayOrder.id,
-      totalAmount:razorpayOrder.amount
+      razorpayOrderId: razorpayOrder.id,
+      totalAmount: razorpayOrder.amount,
     });
   } catch (err) {
     console.log(err);
@@ -61,13 +62,16 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
   }
 };
 
-export const webhookPayment = async (req: Request, res: Response) => {
+export const webhookPayment = async (req: Request, res: Response): Promise<void> => {
   try {
-    const secret = process.env.RAZORPAY_WEBHOOK_SECRET!;
-    // console.log(req);
-    console.log("here webhook inside");
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!secret) {
+      console.error("Missing RAZORPAY_WEBHOOK_SECRET");
+      res.status(500).json({ message: "Webhook secret not configured" });
+      return;
+    }
 
-  
+    console.log("📢 Webhook received");
 
     // ✅ Verify webhook signature
     const signature = req.headers["x-razorpay-signature"] as string;
@@ -78,37 +82,51 @@ export const webhookPayment = async (req: Request, res: Response) => {
       .digest("hex");
 
     if (expectedSignature !== signature) {
-      console.error("Invalid Razorpay Webhook Signature");
-      return res.status(400).json({ message: "Invalid signature" });
+      console.error("❌ Invalid Razorpay Webhook Signature");
+      res.status(400).json({ message: "Invalid signature" });
+      return;
     }
 
-    // ✅ Process Payment Capture Event
+    // ✅ Extract event details safely
     const event = req.body;
     if (event.event === "payment.captured") {
-      const { order_id, id:payment_id, amount } = event.payload.payment.entity;
-
-      // ✅ Find order by Razorpay Order ID
-      const [order] = await db
-        .select()
-        .from(ordersTable)
-        .where(eq(ordersTable.razorpayOrderId, order_id));
-      if (!order) {
-        console.error("Order not found for Razorpay Order ID:", order_id);
-        return res.status(404).json({ message: "Order not found" });
+      const payment = event.payload?.payment?.entity;
+      if (!payment) {
+        console.error("❌ Payment entity missing in webhook payload");
+        res.status(400).json({ message: "Invalid payment data" });
+        return;
       }
 
-      // ✅ Update order status to "Paid"
-      await db
-        .update(ordersTable)
-        .set({ status:'order confirmed',paymentMethod:"online", razorpayPaymentId: payment_id,razorpaySignature:signature })
-        .where(eq(ordersTable.id, order.id));
+      const { order_id, id: payment_id } = payment;
+      if (!order_id || !payment_id) {
+        console.error("❌ Missing required payment fields");
+        res.status(400).json({ message: "Invalid payment details" });
+        return;
+      }
+
+      // ✅ Find order by Razorpay Order ID
+      const [order] = await db.select().from(ordersTable).where(eq(ordersTable.razorpayOrderId, order_id));
+
+      if (!order) {
+        console.error("❌ Order not found for Razorpay Order ID:", order_id);
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+
+      // ✅ Update order status to "Confirmed"
+      await db.update(ordersTable).set({
+        status: "order confirmed",
+        paymentMethod: "online",
+        razorpayPaymentId: payment_id,
+        razorpaySignature: signature,
+      }).where(eq(ordersTable.id, order.id));
 
       console.log(`✅ Order ${order.id} payment successful!`);
     }
 
-    res.status(200).json({ message: "Webhook received" });
+    res.status(200).json({ message: "Webhook processed successfully" });
   } catch (err) {
-    console.error("Webhook Error:", err);
+    console.error("🚨 Webhook Error:", err);
     res.status(500).json({ message: "Webhook processing failed" });
   }
 };

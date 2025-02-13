@@ -16,6 +16,14 @@
     "production": {
       "autoIncrement": true,
       "channel": "production"
+    },
+    "preview-apk": {
+      "distribution": "internal",
+      "channel": "preview-apk",
+      "android": {
+        "applicationArchivePath": "android/app/build/outputs/apk/release/app-release.apk",
+        "buildType": "apk"
+      }
     }
   },
   "submit": {

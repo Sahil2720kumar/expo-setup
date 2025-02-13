@@ -16,6 +16,7 @@ const upload = multer({
     if (file.mimetype.startsWith("image/")) {
       cb(null, true); // Accept the file
     } else {
+       // @ts-ignore
       cb(new Error("Only image files are allowed!"), false); // Reject
     }
   },

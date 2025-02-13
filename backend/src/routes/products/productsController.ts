@@ -12,16 +12,20 @@ const listOfProducts = async (req: Request, res: Response) => {
     // console.log(q);
 
     const categories = req.query.categories
-      ? JSON.parse(req.query.categories)
+      ? JSON.parse(req?.query?.categories as string)
       : [];
-    const colors = req.query.colors ? JSON.parse(req.query.colors) : [];
-    const sizes = req.query.sizes ? JSON.parse(req.query.sizes) : [];
+    const colors = req.query.colors
+      ? JSON.parse(req.query.colors as string)
+      : [];
+    const sizes = req.query.sizes ? JSON.parse(req.query.sizes as string) : [];
     const genderAndAgeCategories = req.query.genderAndAgeCategories
-      ? JSON.parse(req.query.genderAndAgeCategories)
+      ? JSON.parse(req.query.genderAndAgeCategories as string)
       : [];
-    const brands = req.query.brands ? JSON.parse(req.query.brands) : [];
+    const brands = req.query.brands
+      ? JSON.parse(req.query.brands as string)
+      : [];
     const priceRange = req.query.priceRange
-      ? JSON.parse(req.query.priceRange)
+      ? JSON.parse(req.query.priceRange as string)
       : [];
     // console.log(
     //   categories, //[shirt tops]
@@ -36,7 +40,7 @@ const listOfProducts = async (req: Request, res: Response) => {
     const conditions: string | any[] = [];
 
     if (colors.length) {
-      colors.forEach((color) => {
+      colors.forEach((color: any) => {
         conditions.push(
           sql`EXISTS (
             SELECT 1 FROM jsonb_array_elements_text(${productsTable.color}::jsonb) AS elem
@@ -47,7 +51,7 @@ const listOfProducts = async (req: Request, res: Response) => {
     }
 
     if (sizes.length) {
-      sizes.forEach((size) => {
+      sizes.forEach((size: any) => {
         conditions.push(
           sql`EXISTS (
             SELECT 1 FROM jsonb_array_elements_text(${productsTable.size}::jsonb) AS size_elem
@@ -60,7 +64,9 @@ const listOfProducts = async (req: Request, res: Response) => {
     if (genderAndAgeCategories.length) {
       conditions.push(
         sql`LOWER(${productsTable.category}) = ANY(ARRAY[${sql.join(
-          genderAndAgeCategories.map((cat) => sql`${cat.toLowerCase()}`),
+          genderAndAgeCategories.map(
+            (cat: string) => sql`${cat.toLowerCase()}`
+          ),
           sql`, `
         )}]::text[])`
       );
@@ -70,23 +76,23 @@ const listOfProducts = async (req: Request, res: Response) => {
       conditions.push(
         sql`LOWER(${productsTable.subcategory}) = ANY(
           ARRAY[${sql.join(
-            categories.map((cat) => sql`${cat.toLowerCase()}`),
+            categories.map((cat: string) => sql`${cat.toLowerCase()}`),
             sql`, `
           )}]::text[]
         )`
       );
     }
 
-    if (brands.length) {
-      conditions.push(
-        sql`LOWER(${productsTable.brand}) = ANY(
-          ARRAY[${sql.join(
-            brands.map((brand) => sql`${brand.toLowerCase()}`),
-            sql`, `
-          )}]::text[]
-        )`
-      );
-    }
+    // if (brands.length) {
+    //   conditions.push(
+    //     sql`LOWER(${productsTable.brand}) = ANY(
+    //       ARRAY[${sql.join(
+    //         brands.map((brand: string) => sql`${brand.toLowerCase()}`),
+    //         sql`, `
+    //       )}]::text[]
+    //     )`
+    //   );
+    // }
 
     if (priceRange.length) {
       console.log("price range", priceRange);
@@ -150,7 +156,7 @@ const listOfProducts = async (req: Request, res: Response) => {
       totalProductsCount: totalProductsCount[0].count,
       productsList,
     });
-  } catch (err) {
+  } catch (err: any) {
     res
       .status(500)
       .json({ message: "Failed to fetch products", error: err.message });
@@ -251,9 +257,9 @@ const updateProductImages = async (req: Request, res: Response) => {
 
     // Upload images to Cloudinary in parallel
     const productImgs = await Promise.all(
-      req.files
-        ? req.files.map((file) => uploadOnCloudinary(file.path || ""))
-        : []
+      (req.files as Express.Multer.File[])?.map((file) =>
+        uploadOnCloudinary(file.path || "")
+      ) || []
     );
 
     // Update product in the database

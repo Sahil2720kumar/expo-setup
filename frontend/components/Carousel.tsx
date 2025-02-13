@@ -105,7 +105,8 @@ const styles = StyleSheet.create({
   button: {
     position: 'absolute',
     left: '45%',
-    transform: [{ translateX: -70 }],
+    // bottom:160,
+    transform: [{ translateX: -70}],
   },
   pagination: {
     flexDirection: 'row',

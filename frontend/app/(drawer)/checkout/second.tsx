@@ -65,7 +65,7 @@ export default function CheckoutScreen() {
       insertOrder(data, sessionUser?.id!, sessionToken!),
     onSuccess(data) {
       createRazorpayOrder(data.id);
-      console.log('inserted order', data);
+      // console.log('inserted order', data);
       // clearCart();
     },
     onError(error) {
@@ -77,7 +77,7 @@ export default function CheckoutScreen() {
   // ✅ Function to initiate Razorpay Payment
   const handlePayment = async (order) => {
     try {
-      console.log('🔹 Opening Razorpay Payment Modal...', order);
+      // console.log('🔹 Opening Razorpay Payment Modal...', order);
       const options = {
         description: 'Order Payment',
         image: 'https://yourwebsite.com/logo.png',
@@ -98,7 +98,7 @@ export default function CheckoutScreen() {
       const paymentResult = await RazorpayCheckout.open(options);
 
       if (paymentResult.razorpay_payment_id) {
-        console.log('✅ Payment Success:', paymentResult);
+        // console.log('✅ Payment Success:', paymentResult);
         // Alert.alert("Success", "Payment successful!");
         clearCart();
         client.invalidateQueries({ queryKey: ['orders', sessionUser?.id] });
@@ -143,7 +143,7 @@ export default function CheckoutScreen() {
         size:product.productSize
       };
     });
-    console.log(insertedOrderData, insertedOrderItemsData);
+    // console.log(insertedOrderData, insertedOrderItemsData);
     insertOrderToDb({ order: insertedOrderData, items: insertedOrderItemsData });
   };
 

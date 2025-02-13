@@ -89,7 +89,7 @@ const [isSearchQueryExist,setIsSearchQueryExist]=useState(false)
   };
   // const []=useState(products)
 
-  console.log(productsData);
+  // console.log(productsData);
 
   return (
     <ScrollView
