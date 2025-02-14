@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createRazorpayOrder, webhookPayment } from "./paymentsController";
-import { verifyToken } from "../../middlewares/authMiddleware";
+import { createRazorpayOrder, webhookPayment } from "./paymentsController.js";
+import { verifyToken } from "../../middlewares/authMiddleware.js";
 
 const router = Router();
 

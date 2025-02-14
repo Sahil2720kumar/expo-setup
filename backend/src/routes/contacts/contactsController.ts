@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { contactsTable, insertContactSchema } from "../../db/contactsSchema";
+import { contactsTable, insertContactSchema } from "../../db/contactsSchema.js";
 import _ from "lodash";
-import { uploadOnCloudinary } from "../../../utils/cloudinary";
-import { db } from "../../db";
+import { uploadOnCloudinary } from "../../../utils/cloudinary.js";
+import { db } from "../../db/index.js";
 
 export const insertContact = async (req: Request, res: Response) => {
   try {

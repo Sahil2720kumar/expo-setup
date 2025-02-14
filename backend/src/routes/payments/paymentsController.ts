@@ -1,9 +1,9 @@
 import { Request, Response} from "express";
-import { db } from "../../db";
+import { db } from "../../db/index.js";
 import { eq } from "drizzle-orm";
-import razorpay from "../../../config/razorpay.config";
+import razorpay from "../../../config/razorpay.config.js";
 import crypto from "crypto";
-import { ordersTable } from "../../db/ordersSchema";
+import { ordersTable } from "../../db/ordersSchema.js";
 
 export const createRazorpayOrder = async (req: Request, res: Response) => {
   try {

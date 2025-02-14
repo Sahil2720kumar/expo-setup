@@ -18,11 +18,14 @@ const port = 3000;
 app.use(cors())
 app.use(json());
 app.use(urlencoded({ extended: false }));
-app.use(express.static("public"))
+// app.use(express.static("public"))
+app.use(express.static("tmp"))
 // app.use(bodyParser.json())
 
 // Create uploads directory if it doesn't exist
-const dir = './public/uploads';
+// const dir = './public/uploads';
+const dir = '/tmp'; 
+
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir, { recursive: true });
 }

@@ -8,8 +8,8 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { addressesTable, usersTable } from "./usersSchema";
-import { productsTable } from "./productsSchema";
+import { addressesTable, usersTable } from "./usersSchema.js";
+import { productsTable } from "./productsSchema.js";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
