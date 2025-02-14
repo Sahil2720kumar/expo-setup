@@ -29,11 +29,11 @@ const OrderCard = ({ order }: { order: DisplayOrder }) => (
     {/* Products List */}
     <View>
       <Text className="sr-only">Items</Text>
-      {order.orderItems.map((item) => (
-        <View key={item.productId} className="flex flex-col p-4">
+      {order.orderItems.map((item,index) => (
+        <View key={index} className="flex flex-col p-4">
           <View className="flex flex-row items-start">
             <Image
-              source={require('assets/cloth.png')}
+              source={item.product.images ? { uri: item.product.images[0] } : require('./../assets/cloth.png')}
               resizeMode="cover"
               alt={item.product.name}
               className="h-24 w-20 max-w-20 rounded-lg bg-gray-200"

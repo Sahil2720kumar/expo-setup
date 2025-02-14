@@ -1,15 +1,7 @@
+import { useMutation } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import {
-  AlertCircleIcon,
-  ChevronLeft,
-  ChevronRight,
-  EyeIcon,
-  EyeOffIcon,
-  Minus,
-  Package,
-  Plus,
-  Upload,
-} from 'lucide-react-native';
+import { AlertCircleIcon, ChevronLeft } from 'lucide-react-native';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -18,33 +10,22 @@ import {
   Platform,
   TouchableOpacity,
   View,
+  ScrollView
 } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
-// import { ScrollView } from 'react-native-virtualized-view';
-import { ScrollView } from 'react-native';
-import CartItem from '~/components/CartItem';
-import { Bag } from '~/components/Icons';
 
-import { ScreenContent } from '~/components/ScreenContent';
-import { Button, ButtonIcon, ButtonText } from '~/components/ui/button';
+import { updateUser } from '~/api/users';
+import { Button, ButtonText } from '~/components/ui/button';
 import { FormControl } from '~/components/ui/form-control';
 import { HStack } from '~/components/ui/hstack';
 import { Icon } from '~/components/ui/icon';
-import { Image } from '~/components/ui/image';
-import { Input, InputField, InputSlot, InputIcon } from '~/components/ui/input';
+import { Input, InputField } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
-import addressSchema from '~/vaildators/addressSchema';
-import profileSchema, { passwordChangeSchema } from '~/vaildators/profileSchema';
-import { useCommonBreakPoints } from '~/utils/breakPoints';
-import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
-import { useMutation } from '@tanstack/react-query';
-import { updateUser } from '~/api/users';
 import useAuthStore from '~/store/authStore';
+import { useCommonBreakPoints } from '~/utils/breakPoints';
+import { passwordChangeSchema } from '~/vaildators/profileSchema';
 
 export default function PasswordChangeScreen() {
-  const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
+  const { marginAuto, minWidth} = useCommonBreakPoints();
 
   const { width, height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
@@ -76,7 +57,7 @@ export default function PasswordChangeScreen() {
     },
     onSuccess(data) {
       setSessionUser(data.user);
-      console.log(data);
+      // console.log(data);
       router.push('/(drawer)/setting');
     },
     onError(error) {
@@ -87,10 +68,10 @@ export default function PasswordChangeScreen() {
   });
 
   const handleSubmit = async () => {
-    console.log('onSubmit...');
+    // console.log('onSubmit...');
     try {
       const user = await passwordChangeSchema.validate(formData, { abortEarly: false }); // Collect all errors
-      console.log(user);
+      // console.log(user);
       setErrors({});
       mutate()
     } catch (error) {
@@ -99,7 +80,7 @@ export default function PasswordChangeScreen() {
         error.inner.forEach((err) => {
           fieldErrors[err.path] = err.message; // Map field names to their errors
         });
-        console.log(fieldErrors);
+        // console.log(fieldErrors);
         setErrors(fieldErrors);
         // Handle errors (e.g., show them to the user)
       } else {

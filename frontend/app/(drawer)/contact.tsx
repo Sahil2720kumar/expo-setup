@@ -7,39 +7,27 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
+  ScrollView
 } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
-// import { ScrollView } from 'react-native-virtualized-view';
-import { ScrollView } from 'react-native';
-import CartItem from '~/components/CartItem';
-import { Bag } from '~/components/Icons';
 
-import { ScreenContent } from '~/components/ScreenContent';
-import { Button, ButtonIcon, ButtonText } from '~/components/ui/button';
+import { Button, ButtonText } from '~/components/ui/button';
 import { FormControl } from '~/components/ui/form-control';
 import { HStack } from '~/components/ui/hstack';
 import { Icon } from '~/components/ui/icon';
-import { Input, InputField, InputSlot, InputIcon } from '~/components/ui/input';
+import { Input, InputField} from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
-import addressSchema from '~/vaildators/addressSchema';
-import { profileSchema } from '~/vaildators/profileSchema';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import * as ImagePicker from 'expo-image-picker';
-import { Textarea, TextareaInput } from '~/components/ui/textarea';
-import { Link } from 'expo-router';
 import { useMutation } from '@tanstack/react-query';
 import contactSchema from '~/vaildators/contactShema';
 import { insertContact } from '~/api/contacts';
 
 export default function ProfileScreen() {
-  const { marginAuto, minWidth, profileImageSize, imageSize, iconSize } = useCommonBreakPoints();
+  const { marginAuto, minWidth } = useCommonBreakPoints();
   const [mutateError, setMutateError] = useState<string | null>(null);
-  const { width, height: screenHeight } = Dimensions.get('window');
-  const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
+  const { height: screenHeight } = Dimensions.get('window');
+  // const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -58,7 +46,7 @@ export default function ProfileScreen() {
         quality: 1,
       });
 
-      console.log(result);
+      // console.log(result);
 
       if (!result.canceled) {
         setContactImg(result.assets[0].uri);
@@ -85,7 +73,7 @@ export default function ProfileScreen() {
 
       // 1. Append image properly
       if (contactImg) {
-        console.log('heres');
+        // console.log('heres');
 
         formDataCons.append('contactImg', {
           uri: contactImg,
@@ -109,7 +97,7 @@ export default function ProfileScreen() {
       return insertContact(formDataCons);
     },
     onSuccess(data) {
-      console.log(data);
+      // console.log(data);
     },
     onError(error) {
       console.log('failed:', error);
@@ -119,10 +107,10 @@ export default function ProfileScreen() {
   });
 
   const handleSubmit = async () => {
-    console.log('onSubmit...');
+    // console.log('onSubmit...');
     try {
       const user = await contactSchema.validate(formData, { abortEarly: false }); // Collect all errors
-      console.log(user);
+      // console.log(user);
       setErrors({});
       mutate();
     } catch (error) {
@@ -131,7 +119,7 @@ export default function ProfileScreen() {
         error.inner.forEach((err) => {
           fieldErrors[err.path] = err.message; // Map field names to their errors
         });
-        console.log(fieldErrors);
+        // console.log(fieldErrors);
         setErrors(fieldErrors);
         // Handle errors (e.g., show them to the user)
       } else {

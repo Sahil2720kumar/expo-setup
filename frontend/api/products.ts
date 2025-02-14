@@ -1,6 +1,6 @@
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export const getAllProducts = async (page = 1, pageSize = 6, filterOptions = {},searchQuery) => {
+export const getAllProducts = async (page = 1, pageSize = 6, filterOptions = {}, searchQuery) => {
   try {
     // Initialize query parameters with pagination
 

@@ -115,10 +115,10 @@ export default function AddAddressScreen() {
   }
 
   const handleSubmit = async () => {
-    console.log('onSubmit...');
+    // console.log('onSubmit...');
     try {
       const address = await addressSchema.validate(formData, { abortEarly: false }); // Collect all errors
-      console.log(address);
+      // console.log(address);
       setErrors({});
       setMutateError(null);
       mutate({
@@ -133,7 +133,7 @@ export default function AddAddressScreen() {
         error.inner.forEach((err) => {
           fieldErrors[err.path] = err.message; // Map field names to their errors
         });
-        console.log(fieldErrors);
+        // console.log(fieldErrors);
         setErrors(fieldErrors);
         // Handle errors (e.g., show them to the user)
       } else {

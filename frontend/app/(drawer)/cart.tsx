@@ -15,14 +15,14 @@ import { useCommonBreakPoints } from '~/utils/breakPoints';
 export default function CartScreen() {
   const router = useRouter();
   const { marginAuto, minWidth } = useCommonBreakPoints();
-  const { products: cartItems, addProduct, reduceProduct, totalPrice } = useCartStore();
+  const { products: cartItems,  totalPrice } = useCartStore();
 
-  const { width, height: screenHeight } = Dimensions.get('window');
+  const {  height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
 
-  const onHandleClick = () => {
-    router.push('/(drawer)/checkout');
-  };
+  // const onHandleClick = () => {
+  //   router.push('/(drawer)/checkout');
+  // };
 
   return (
     <ScrollView

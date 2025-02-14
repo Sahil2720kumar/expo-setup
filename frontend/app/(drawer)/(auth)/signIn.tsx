@@ -22,15 +22,13 @@ import { HStack } from '~/components/ui/hstack';
 import { Icon } from '~/components/ui/icon';
 import { Input, InputField, InputIcon, InputSlot } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
 import useAuthStore from '~/store/authStore';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
-import { userSignInSchema } from '~/vaildators/userSchema';
 
 const SignIn = () => {
   const { marginAuto, minWidth } = useCommonBreakPoints();
   const { setSessionUser, setSessionToken, sessionToken,sessionUser } = useAuthStore();
-  const { width, height: screenHeight } = Dimensions.get('window');
+  // const { width, height: screenHeight } = Dimensions.get('window');
   const [formData, setFormData] = useState({
     email: '',
     password: '',

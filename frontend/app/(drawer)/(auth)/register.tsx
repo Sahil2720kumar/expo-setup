@@ -11,7 +11,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { signUpUser } from '~/api/auth';
-import { Loading } from '~/components/Icons';
 
 import { Button, ButtonText } from '~/components/ui/button';
 import { FormControl } from '~/components/ui/form-control';

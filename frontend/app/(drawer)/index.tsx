@@ -1,19 +1,16 @@
-import { Stack } from 'expo-router';
 import {
   Dimensions,
   View,
   FlatList,
   TouchableOpacity,
-  Platform,
+ 
   ActivityIndicator,
 } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
 // import { ScrollView } from 'react-native';
 import Carousel from '~/components/Carousel';
 
-import ProductCategoryTabs from '~/components/ProductCategoryTabs';
 import ProductSliderCard from '~/components/ProductSliderCard';
-import { Icon } from '~/components/ui/icon';
 import { Text } from '~/components/ui/text';
 import { ListChecks, Truck, UserRoundCheck } from 'lucide-react-native';
 import Footer from '~/components/Footer';
@@ -24,8 +21,8 @@ import { getAllProducts } from '~/api/products';
 export default function Home() {
   const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
   const isMobile = screenWidth < 768;
-  const calculatedHeight = isMobile ? screenHeight - 100 : '90%';
-  const calculatedAdditionalHeight = screenHeight + 100;
+  // const calculatedHeight = isMobile ? screenHeight - 100 : '90%';
+  // const calculatedAdditionalHeight = screenHeight + 100;
 
   const marginAuto = useBreakpointValue({
     default: '',

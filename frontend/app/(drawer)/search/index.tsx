@@ -1,15 +1,15 @@
-import { ScrollView, Pressable, TouchableOpacity } from 'react-native';
+import { ScrollView } from 'react-native';
 // import { Input, InputField, InputIcon, Button, ButtonIcon, Text, VStack, HStack, Box } from "@gluestack-ui/themed"
 import { Search, X } from 'lucide-react-native';
 import { VStack } from '~/components/ui/vstack';
 import { Box } from '~/components/ui/box';
-import { Input, InputField, InputIcon, InputSlot } from '~/components/ui/input';
+import { Input, InputField, InputSlot } from '~/components/ui/input';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 
 export default function SearchInterface() {
-  const { marginAuto, minWidth, iconProductSize: iconSize, noColumns } = useCommonBreakPoints();
+  const { marginAuto, minWidth } = useCommonBreakPoints();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -38,7 +38,7 @@ export default function SearchInterface() {
         <Box>
           <Input variant="underlined">
             <InputSlot>
-              <Search size={24} />
+              <Search size={24} color={"black"} />
             </InputSlot>
             <InputField
               placeholder="Search items"
@@ -49,7 +49,7 @@ export default function SearchInterface() {
               returnKeyType="search" // Makes keyboard return key a search button
             />
             <InputSlot className="pl-3">
-              <X  size={24} onPress={() => router.push("/(drawer)")} />
+              <X size={24} color={"black"} onPress={() => router.push("/(drawer)")} />
             </InputSlot>
           </Input>
         </Box>

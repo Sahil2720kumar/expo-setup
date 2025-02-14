@@ -3,8 +3,6 @@ import { LayoutList } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, FlatList, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-virtualized-view';
-
-import { products } from '@/assets/data/product.json';
 import { getAllProducts } from '~/api/products';
 import FilterDrawer from '~/components/FilterDrawer';
 import Footer from '~/components/Footer';
@@ -46,7 +44,6 @@ const [isSearchQueryExist,setIsSearchQueryExist]=useState(false)
 
   const {
     data: productsData,
-    isPlaceholderData,
     isLoading,
     error,
   } = useQuery({

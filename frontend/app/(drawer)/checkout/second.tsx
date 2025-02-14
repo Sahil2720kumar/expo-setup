@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronRight, Package, Plus } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { ActivityIndicator, Dimensions, Platform, TouchableOpacity, View } from 'react-native';
 import RazorpayCheckout from 'react-native-razorpay';
 import { ScrollView } from 'react-native-virtualized-view';
@@ -28,7 +28,7 @@ export default function CheckoutScreen() {
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
   const { sessionUser, sessionToken } = useAuthStore();
-  const { products, clearCart } = useCartStore();
+  const { products, clearCart,totalPrice } = useCartStore();
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const {
     data: addresses = [],
@@ -45,7 +45,7 @@ export default function CheckoutScreen() {
   const { mutate: createRazorpayOrder, isPending: razorpayIsPending } = useMutation({
     mutationFn: (data: number) => createPayment(data, sessionToken!),
     onSuccess(data) {
-      console.log('✅ Order Created:', data); // 👈 Order created in backend
+      // console.log('✅ Order Created:', data); // 👈 Order created in backend
       if (data.razorpayOrderId) {
         handlePayment(data); // 🛒 Open Razorpay payment UI
       } else {
@@ -131,7 +131,7 @@ export default function CheckoutScreen() {
     // setIsPaymentSuccessful(true);
     setIsCheckoutLoading(true);
 
-    console.log(products);
+    // console.log(products);
     const insertedOrderData = {
       addressId: selectedAddress,
     };
@@ -242,8 +242,8 @@ export default function CheckoutScreen() {
 
           <View className="flex-row justify-between">
             <Text className="font-bold uppercase text-black">Est. Total</Text>
-            <Text className="font-bold text-[#F93C00]">$179</Text>
-          </View>
+            <Text className="font-bold text-[#F93C00]">₹ {totalPrice}</Text>
+          </View> 
 
           <Button
             size="md"

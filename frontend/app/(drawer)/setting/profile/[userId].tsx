@@ -25,7 +25,6 @@ import { Text } from '~/components/ui/text';
 import useAuthStore from '~/store/authStore';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import { profileSchema } from '~/vaildators/profileSchema';
-import * as FileSystem from 'expo-file-system';
 
 export default function ProfileScreen() {
   const { userId } = useLocalSearchParams();

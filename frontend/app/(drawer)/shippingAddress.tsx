@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Pencil, Plus } from 'lucide-react-native';
 import { ActivityIndicator, Dimensions, Platform, TouchableOpacity, View } from 'react-native';
@@ -13,9 +13,8 @@ import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function ShippingAddressScreen() {
   const { sessionUser, sessionToken } = useAuthStore();
-  const router = useRouter();
   const { marginAuto, minWidth } = useCommonBreakPoints();
-  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+  const {  height: screenHeight } = Dimensions.get('window');
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
 
   const {

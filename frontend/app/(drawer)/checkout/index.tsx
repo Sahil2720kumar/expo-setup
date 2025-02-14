@@ -14,7 +14,7 @@ import useCartStore from '~/store/cartStore';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 
 export default function CheckoutScreen() {
-  const { products: cartItems, addProduct, reduceProduct, totalPrice } = useCartStore();
+  const { products: cartItems, totalPrice } = useCartStore();
 
   const router = useRouter();
   const { marginAuto, minWidth } = useCommonBreakPoints();

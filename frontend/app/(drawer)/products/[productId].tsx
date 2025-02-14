@@ -1,18 +1,16 @@
-import { ActivityIndicator, FlatList, Pressable, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView } from 'react-native-virtualized-view';
 import { Text } from '~/components/ui/text';
 import { ChevronLeft, Heart, Share2 } from 'lucide-react-native';
 import { Dimensions } from 'react-native';
 import Carousel from '~/components/Carousel';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Bag, DoNotDryTumble, DoNotUse, DryClean, Iron } from '~/components/Icons';
 import { Icon } from '~/components/ui/icon';
 import ProductAccordion from '~/components/ProductAccordion';
 import ProductSliderCard from '~/components/ProductSliderCard';
 import Footer from '~/components/Footer';
-import { useBreakpointValue } from '~/components/ui/utils/use-break-point-value';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import {  useLocalSearchParams, useRouter } from 'expo-router';
 import { useCommonBreakPoints } from '~/utils/breakPoints';
 import { getAllProducts, getProductById } from '~/api/products';
 import { useQuery } from '@tanstack/react-query';
@@ -36,7 +34,6 @@ const ProductDetailsScreen = () => {
   // console.log('productID', productId);
   // console.log('isAlreadyInvar', isAlreadyInCart);
 
-  const sliderData = [1, 2, 34, 4, 5];
   const careAdvice = [
     { id: 1, icon: Iron, description: 'Iron at a maximum of 110ºC/230ºF' },
     { id: 2, icon: DryClean, description: 'Dry clean with tetrachloroethylene' },
