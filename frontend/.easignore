@@ -1,0 +1,15 @@
+# Default ignores for EAS Build
+node_modules/
+**/ios/
+**/android/
+.git/
+.expo/
+.DS_Store
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.env
+.env.local
+.env.development
+.env.test

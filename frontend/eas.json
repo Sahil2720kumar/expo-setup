@@ -6,24 +6,17 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "channel": "development"
+      "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "channel": "preview"
+      "distribution": "internal"
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
-    },
-    "preview-apk": {
-      "distribution": "internal",
-      "channel": "preview-apk",
       "android": {
-        "applicationArchivePath": "android/app/build/outputs/apk/release/app-release.apk",
-        "buildType": "apk"
-      }
+        "buildType": "apk" 
+      },
+      "releaseChannel": "production"
     }
   },
   "submit": {

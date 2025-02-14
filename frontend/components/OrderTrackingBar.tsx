@@ -19,7 +19,7 @@ export default function OrderTrackingBar({ currentStep }: OrderTrackingBarProps)
     <View className='py-8'>
       <View className="mb-4 flex-row  justify-between">
         {steps.map((step, index) => (
-          <View key={step} className="items-start">
+          <View key={index} className="items-start">
             <Text className="text-xs font-medium text-center">{step}</Text>
           </View>
         ))}

@@ -31,7 +31,7 @@ export default function ProductCard({
             isTruncated>
             {description}
           </Text>
-          <Text className="text-xl font-semibold text-[#F93C00]">{price ? price : '$179'}</Text>
+          <Text className="text-xl font-semibold text-[#F93C00]">{price ? "₹ "+price : '$179'}</Text>
         </View>
       </TouchableOpacity>
     </Link>

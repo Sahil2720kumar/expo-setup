@@ -153,8 +153,8 @@ const ProductDetailsScreen = () => {
           <Text className="text-lg font-medium text-black">Back</Text>
         </TouchableOpacity>
         <View className="flex-row items-center justify-between gap-2">
-          <Heart color={'black'} />
-          <Share2 color={'black'} />
+          {/* <Heart color={'black'} />
+          <Share2 color={'black'} /> */}
         </View>
       </View>
       <View className="h-[100%] flex-1">
@@ -186,7 +186,7 @@ const ProductDetailsScreen = () => {
                 className="text-md w-full text-[#888888]">
                 For {productData?.category}
               </Text>
-              <Text className="w-full text-xl font-bold text-[#F93C00]">{productData?.price}</Text>
+              <Text className="w-full text-xl font-bold text-[#F93C00]">₹ {productData?.price}</Text>
             </View>
             <TouchableOpacity
               onPress={addToCart}
