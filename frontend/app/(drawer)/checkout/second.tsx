@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronRight, Package, Plus } from 'lucide-react-native';
-import {  useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, Platform, TouchableOpacity, View } from 'react-native';
 import RazorpayCheckout from 'react-native-razorpay';
 import { ScrollView } from 'react-native-virtualized-view';
@@ -28,7 +28,7 @@ export default function CheckoutScreen() {
   const calculatedHeight = screenHeight - 200; // Subtract 100px from screen height
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
   const { sessionUser, sessionToken } = useAuthStore();
-  const { products, clearCart,totalPrice } = useCartStore();
+  const { products, clearCart, totalPrice } = useCartStore();
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const {
     data: addresses = [],
@@ -40,6 +40,24 @@ export default function CheckoutScreen() {
   });
 
   const [selectedAddress, setSelectedAddress] = useState<number>(addresses?.[0]?.id || 1);
+
+  // Add Razorpay script to DOM for web
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      console.log("im in web");
+      
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => console.log('✅ Razorpay script loaded successfully');
+      script.onerror = () => console.error('❌ Failed to load Razorpay script');
+      document.head.appendChild(script);
+
+      return () => {
+        document.head.removeChild(script);
+      };
+    }
+  }, []);
 
   //RAZORPAY CREATE ORDER
   const { mutate: createRazorpayOrder, isPending: razorpayIsPending } = useMutation({
@@ -54,7 +72,7 @@ export default function CheckoutScreen() {
       }
     },
     onError(error) {
-      setIsCheckoutLoading(false)
+      setIsCheckoutLoading(false);
       console.error('❌ Order Creation Failed', error);
     },
   });
@@ -69,48 +87,82 @@ export default function CheckoutScreen() {
       // clearCart();
     },
     onError(error) {
-      setIsCheckoutLoading(false)
+      setIsCheckoutLoading(false);
       console.log('insert Failed', error);
     },
   });
 
   // ✅ Function to initiate Razorpay Payment
+  // ✅ Modified payment handler for web and native
   const handlePayment = async (order) => {
+    // console.log('order', order);
+
     try {
-      // console.log('🔹 Opening Razorpay Payment Modal...', order);
       const options = {
         description: 'Order Payment',
         image: 'https://yourwebsite.com/logo.png',
         currency: 'INR',
-        key: 'rzp_test_7gab4oSDkJm8bL', // Replace with Razorpay Key ID
-        amount: order.totalAmount * 100, // Convert to paisa
+        key: 'rzp_test_7gab4oSDkJm8bL', // Your Razorpay Key
+        amount: order.totalAmount, // Convert to paisa
         name: 'Dropsquad',
-        order_id: order.razorpayOrderId, // ✅ Razorpay Order ID from backend
+        order_id: order.razorpayOrderId,
         prefill: {
           email: sessionUser?.email,
           contact: sessionUser?.phone,
           name: sessionUser?.name,
         },
         theme: { color: '#F93C00' },
+        // Add success handler directly in options
+        handler: (response: any) => {
+          console.log('✅ Payment Success:', response);
+          clearCart();
+          client.invalidateQueries({ queryKey: ['orders', sessionUser?.id] });
+          setIsCheckoutLoading(false);
+          router.push('/(drawer)/orders');
+        },
+        modal: {
+          ondismiss: () => {
+            console.log('❌ Payment modal dismissed by user');
+            alert('Payment was not completed. Please try again.');
+            setIsCheckoutLoading(false);
+          },
+        },
       };
 
-      // ✅ Open Razorpay Payment Modal
-      const paymentResult = await RazorpayCheckout.open(options);
+      // console.log('🛒 Payment Options:', options);
 
-      if (paymentResult.razorpay_payment_id) {
-        // console.log('✅ Payment Success:', paymentResult);
-        // Alert.alert("Success", "Payment successful!");
-        clearCart();
-        client.invalidateQueries({ queryKey: ['orders', sessionUser?.id] });
-        setIsCheckoutLoading(false);
-        router.push('/(drawer)/orders'); // Navigate to orders page
+      if (Platform.OS === 'web') {
+        // Web implementation
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open({
+          handler: (response: any) => {
+            if (response.razorpay_payment_id) {
+              clearCart();
+              client.invalidateQueries({ queryKey: ['orders', sessionUser?.id] });
+              setIsCheckoutLoading(false);
+              router.push('/(drawer)/orders');
+            }
+          },
+          'modal.close': () => {
+            setIsCheckoutLoading(false);
+          },
+        });
       } else {
-        // Alert.alert("Payment Failed", "Something went wrong.");
+        // Native implementation
+        const paymentResult = await RazorpayCheckout.open(options);
+        // console.log('✅ Native Payment Result:', paymentResult);
+
+        if (paymentResult.razorpay_payment_id) {
+          clearCart();
+          client.invalidateQueries({ queryKey: ['orders', sessionUser?.id] });
+          setIsCheckoutLoading(false);
+          router.push('/(drawer)/orders');
+        }
       }
     } catch (error) {
       console.error('❌ Payment Error:', error);
-      setIsCheckoutLoading(false)
-      // Alert.alert("Payment Error", "Transaction failed.");
+      alert('Payment Error: ' + (error.message || 'Something went wrong.'));
+      setIsCheckoutLoading(false);
     }
   };
 
@@ -139,8 +191,8 @@ export default function CheckoutScreen() {
       return {
         productId: product?.id,
         quantity: product.quantity,
-        color:product.productColor,
-        size:product.productSize
+        color: product.productColor,
+        size: product.productSize,
       };
     });
     // console.log(insertedOrderData, insertedOrderItemsData);
@@ -243,7 +295,7 @@ export default function CheckoutScreen() {
           <View className="flex-row justify-between">
             <Text className="font-bold uppercase text-black">Est. Total</Text>
             <Text className="font-bold text-[#F93C00]">₹ {totalPrice}</Text>
-          </View> 
+          </View>
 
           <Button
             size="md"
@@ -251,8 +303,7 @@ export default function CheckoutScreen() {
             isDisabled={isCheckoutLoading}
             disabled={isCheckoutLoading}
             className="h-[48px] rounded-full bg-[#F93C00]"
-            onPress={onCheckOut}
-            >
+            onPress={onCheckOut}>
             {isCheckoutLoading ? (
               <View className="flex-row gap-3">
                 <ActivityIndicator color={'white'} />

@@ -12,7 +12,7 @@ export const insertOrder = async (
   sessionToken: string
 ) => {
   try {
-    console.log('order data', insertedOrderData);
+    // console.log('order data', insertedOrderData);
 
     console.log(userId);
     const res = await fetch(`${API_URL}/orders/`, {

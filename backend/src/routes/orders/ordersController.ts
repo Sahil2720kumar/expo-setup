@@ -104,6 +104,7 @@ export const listOfOrders = async (req: Request, res: Response) => {
               columns: {
                 name: true,
                 description: true,
+                images:true
               },
             },
           },
@@ -147,6 +148,7 @@ export const getOrderById = async (req: Request, res: Response) => {
               columns: {
                 name: true,
                 description: true,
+                images:true
               },
             },
           },
